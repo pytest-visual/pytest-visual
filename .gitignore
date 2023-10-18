@@ -1,6 +1,7 @@
 __pycache__
 *.pyc
 pytest_unitvis.egg-info/
+dist/
 
 .unitvis/
 
