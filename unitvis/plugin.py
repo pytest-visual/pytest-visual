@@ -1,7 +1,13 @@
+import pytest
 
-def pytest_addoption(parser) -> None:
-    parser.addoption("--custom_option", action="store", default="default_value")
+from unitvis.visualize import Visualize
+
+def pytest_addoption(parser):
+    parser.addoption("--visualize", action="store_true", help="Run visualization tests")
     
-def pytest_configure(config):
-    custom_option_value = config.getoption("--custom_option")
-    config._custom_option = custom_option_value
+@pytest.fixture
+def visualize(request):
+    if request.config.getoption("--visualize"):
+        return Visualize()
+    else:
+        pytest.skip("Visualization is not enabled, add --visualize option to enable")
