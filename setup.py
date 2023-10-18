@@ -1,3 +1,4 @@
+import os
 from typing import List
 from setuptools import setup, find_packages
 
@@ -6,9 +7,12 @@ def get_requirements() -> List[str]:
         'pytest>=7.0.0',
     ]
 
+version = os.getenv('RELEASE_VERSION')
+assert version is not None, 'RELEASE_VERSION environment variable must be set, this is typically done by the release pipeline.'
+
 setup(
     name='pytest-unitvis',
-    version='0.0.2',
+    version=version,
     packages=find_packages(),
     entry_points={'pytest11': ['unitvis = unitvis.plugin']},
 
