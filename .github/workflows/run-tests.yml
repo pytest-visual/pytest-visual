@@ -32,7 +32,7 @@ jobs:
 
     - name: Install Plugin
       run: |
-        pip install -e .
+        RELEASE_VERSION=0.0.1 pip install -e .
 
     - name: Test with pytest
       run: |
