@@ -1,5 +1,5 @@
 __pycache__
 *.pyc
+pytest_unitvis.egg-info/
 
-.unitvis
-
+.unitvis/
