@@ -50,7 +50,7 @@ The output is only printed, plotted, and asked for manual review, if something c
 With unitvis plugin, the following options are added to `pytest`:
 * `pytest --visualize`
   * Run pytest with visualization cases, and prompt user for manual review for all changed cases.
-* `pytest --visualize --yes`
-  * If `--yes` is supplied, everything is accepted without prompting.
-* `pytest --visualize --reset-all`
+* `pytest --visualize-yes-all`
+  * Everything is accepted without prompting.
+* `pytest --visualize-reset-all`
   * Don't visualize, but mark all cases as unaccepted.
