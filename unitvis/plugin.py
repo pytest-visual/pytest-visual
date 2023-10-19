@@ -55,7 +55,7 @@ def _teardown_wo_yes_all(path: Path, statements: List[Statement]) -> None:
 
     if statements != prev_statements:
         if prev_statements is None:
-            prev_statements = [("print", "No visualizations accepted yet")]
+            prev_statements = [["print", "No visualizations accepted yet"]]
         if prompt_confirmation(prev_statements, statements):
             write_statements(path, statements)
         else:
