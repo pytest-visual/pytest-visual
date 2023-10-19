@@ -5,7 +5,7 @@ from typing import Tuple, List
 from pathlib import Path
 
 from unitvis.visualize import Visualize
-from unitvis.io import read_statements, write_statements, clear_statements, prompt_confirmation, Statement
+from unitvis.io import get_storage_path, read_statements, write_statements, clear_statements, prompt_confirmation, Statement
 
 def pytest_addoption(parser: Parser):
     parser.addoption("--visualize", action="store_true", help="Run visualization tests, prompt for acceptance")
@@ -17,7 +17,7 @@ def pytest_addoption(parser: Parser):
 def visualize(request: FixtureRequest):
     run_visualization, yes_all, reset_all = _get_visualization_flags(request)
     visualizer = Visualize()
-    path = Path(".unitvis")/("data2.json")
+    storage_path = get_storage_path(request)
 
     if run_visualization:
         # Run test
@@ -26,11 +26,11 @@ def visualize(request: FixtureRequest):
         # Handle visualization
         statements = visualizer.statements
         if yes_all:
-            _teardown_with_yes_all(path, statements)
+            _teardown_with_yes_all(storage_path, statements)
         else:
-            _teardown_wo_yes_all(path, statements)
+            _teardown_wo_yes_all(storage_path, statements)
     elif reset_all:
-        _teardown_with_reset_all(path)
+        _teardown_with_reset_all(storage_path)
     else:
         pytest.skip("Visualization is not enabled, add --visualize option to enable")
 
