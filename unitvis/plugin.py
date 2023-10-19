@@ -5,7 +5,8 @@ from typing import Tuple, List
 from pathlib import Path
 
 from plotly.graph_objs import Figure
-from unitvis.io import get_storage_path, read_statements, write_statements, clear_statements, prompt_confirmation, Statement
+from unitvis.io import get_storage_path, read_statements, write_statements, clear_statements, Statement
+from unitvis.prompter import unitvis_prompter, Prompter
 
 def pytest_addoption(parser: Parser):
     parser.addoption("--visualize", action="store_true", help="Run visualization tests, prompt for acceptance")
@@ -14,7 +15,7 @@ def pytest_addoption(parser: Parser):
 
 
 @pytest.fixture
-def visualize(request: FixtureRequest):
+def visualize(request: FixtureRequest, unitvis_prompter: Prompter):
     run_visualization, yes_all, reset_all = _get_visualization_flags(request)
     visualizer = Visualize()
     storage_path = get_storage_path(request)
@@ -28,7 +29,7 @@ def visualize(request: FixtureRequest):
         if yes_all:
             _teardown_with_yes_all(storage_path, statements)
         else:
-            _teardown_wo_yes_all(storage_path, statements)
+            _teardown_with_verification(unitvis_prompter, storage_path, statements)
     elif reset_all:
         _teardown_with_reset_all(storage_path)
     else:
@@ -50,13 +51,11 @@ def _teardown_with_yes_all(path: Path, statements: List[Statement]) -> None:
     write_statements(path, statements)
 
 
-def _teardown_wo_yes_all(path: Path, statements: List[Statement]) -> None:
+def _teardown_with_verification(prompter: Prompter, path: Path, statements: List[Statement]) -> None:
     prev_statements = read_statements(path)
 
     if statements != prev_statements:
-        if prev_statements is None:
-            prev_statements = [["print", "No visualizations accepted yet"]]
-        if prompt_confirmation(prev_statements, statements):
+        if prompter.prompt_user(prev_statements, statements):
             write_statements(path, statements)
         else:
             pytest.fail("Visualizations were not accepted")

@@ -35,17 +35,4 @@ def clear_statements(storage_path: Path) -> None:
         shutil.rmtree(storage_path)
 
 
-def prompt_confirmation(prev_statements: List[Statement], statements: List[Statement]) -> bool:
-    # TODO: Add Dash to show visualizations
-
-    while True:
-        print("Do you want to accept these changes? [y/n] ", end="", flush=True)
-        inp = input()
-        if inp == "y":
-            return True
-        elif inp == "n":
-            return False
-        else:
-            print("Invalid input, please enter y or n")
-
 _statements_file = "statements.json"

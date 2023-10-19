@@ -1,6 +1,6 @@
 import pytest
 from pathlib import Path
-from unitvis.io import Statement, get_storage_path, read_statements, write_statements, clear_statements, prompt_confirmation
+from unitvis.io import Statement, get_storage_path, read_statements, write_statements, clear_statements
 
 @pytest.fixture
 def get_storage_path_fixture(request) -> Path:
