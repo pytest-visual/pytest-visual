@@ -1,5 +1,5 @@
 from plotly.graph_objs import Figure
-from typing import List, Tuple, Union, Dict
+from typing import List
 from unitvis.io import Statement
 
 class Visualize:

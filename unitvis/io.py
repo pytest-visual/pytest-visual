@@ -1,11 +1,11 @@
 from pathlib import Path
-from typing import List, Tuple, Union, Dict
+from typing import List, Optional
 import json
 import os
 
 Statement = List[str]  # ["print" | "plot", item]
 
-def read_statements(path: Path) -> List[Statement] | None:
+def read_statements(path: Path) -> Optional[List[Statement]]:
     if path.exists():
         with path.open("r") as f:
             return json.load(f)
