@@ -1,8 +1,13 @@
-import matplotlib.pyplot as plt
+from plotly.graph_objs import Figure
+from typing import List, Tuple, Union, Dict
+from unitvis.io import Statement
 
 class Visualize:
-    def print(self, text):
-        print(text)
+    def __init__(self):
+        self.statements: List[Statement] = []
 
-    def plot(self, plt):
-        plt.show()
+    def print(self, text) -> None:
+        self.statements.append(["print", text])
+
+    def show(self, fig: Figure) -> None:
+        self.statements.append(["plot", str(fig.to_json())])

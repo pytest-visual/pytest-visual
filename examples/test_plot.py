@@ -1,13 +1,9 @@
 from unitvis.visualize import Visualize
-import matplotlib.pyplot as plt
+import plotly.express as px
 
 def test_plot(visualize: Visualize):
-    n = 5
-    x, y = [], []
-    for i in range(n):
-        x.append(i)
-        y.append(i**2)
-    plt.plot(x, y)
+    x, y = [0, 1, 2, 3, 4, 5], [0, 1, 4, 9, 16, 25]
+    fig = px.scatter(x, y)
 
-    visualize.print(f"Number of points: {n}")
-    visualize.plot(plt)
+    visualize.print(f"Number of points: {len(x)}")
+    visualize.show(fig)
