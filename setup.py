@@ -6,6 +6,7 @@ def get_requirements() -> List[str]:
     return [
         'pytest>=7.0.0',
         'plotly>=5.0.0',
+        'pandas>=2.0.0',
     ]
 
 version = os.getenv('RELEASE_VERSION')
