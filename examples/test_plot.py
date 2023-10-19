@@ -1,4 +1,4 @@
-from unitvis.visualize import Visualize
+from unitvis.plugin import Visualize
 import plotly.express as px
 
 def test_plot(visualize: Visualize):

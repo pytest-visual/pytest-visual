@@ -4,7 +4,7 @@ from _pytest.fixtures import FixtureRequest
 from typing import Tuple, List
 from pathlib import Path
 
-from unitvis.visualize import Visualize
+from plotly.graph_objs import Figure
 from unitvis.io import get_storage_path, read_statements, write_statements, clear_statements, prompt_confirmation, Statement
 
 def pytest_addoption(parser: Parser):
@@ -65,3 +65,14 @@ def _teardown_wo_yes_all(path: Path, statements: List[Statement]) -> None:
 def _teardown_with_reset_all(path: Path) -> None:
     clear_statements(path)
     pytest.skip("Resetting visualization case as per --visualize-reset-all")
+
+
+class Visualize:
+    def __init__(self):
+        self.statements: List[Statement] = []
+
+    def print(self, text) -> None:
+        self.statements.append(["print", text])
+
+    def show(self, fig: Figure) -> None:
+        self.statements.append(["plot", str(fig.to_json())])
