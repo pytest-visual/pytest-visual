@@ -12,7 +12,7 @@ from unitvis.io import Statement
 plotly.io.templates.default = "plotly_white"
 update_interval_ms = 200
 
-_global_button_clicked: str | None = None
+_global_button_clicked: Optional[str] = None
 
 
 @pytest.fixture(scope="session")
