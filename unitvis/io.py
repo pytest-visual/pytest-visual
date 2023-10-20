@@ -1,10 +1,11 @@
-from pathlib import Path
-from typing import List, Optional
 import json
 import os
 import shutil
+from pathlib import Path
+from typing import List, Optional
 
 Statement = List[str]  # ["print" | "plot", item]
+
 
 def get_storage_path(request) -> Path:
     root_path = Path(request.config.rootdir)
@@ -31,7 +32,7 @@ def write_statements(storage_path: Path, statements: List[Statement]) -> None:
 
 
 def clear_statements(storage_path: Path) -> None:
-    if storage_path.exists(): # This is a diretory
+    if storage_path.exists():  # This is a directory
         shutil.rmtree(storage_path)
 
 

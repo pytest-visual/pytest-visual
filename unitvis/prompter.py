@@ -1,12 +1,13 @@
-import pytest
-from dash import Dash, html, callback, Input, Output, State, ctx, dcc
-import dash_bootstrap_components as dbc
-import plotly
-from flask import Flask
-from pathlib import Path
-from typing import List, Tuple, Optional
 import threading
 import time
+from typing import List, Optional
+
+import dash_bootstrap_components as dbc
+import plotly
+import pytest
+from dash import Dash, Input, Output, State, callback, ctx, dcc, html
+from flask import Flask
+
 from unitvis.io import Statement
 
 plotly.io.templates.default = "plotly_white"
@@ -30,8 +31,8 @@ class Prompter:
         self.thread.start()
 
         @self.app.callback(
-            Output('accept-button', 'n_clicks_timestamp'),  # Output is dummy, just to trigger the callback
-            Output('decline-button', 'n_clicks_timestamp'),  # Output is dummy, just to trigger the callback
+            Output("accept-button", "n_clicks_timestamp"),  # Output is dummy, just to trigger the callback
+            Output("decline-button", "n_clicks_timestamp"),  # Output is dummy, just to trigger the callback
             Input("accept-button", "n_clicks"),
             Input("decline-button", "n_clicks"),
         )
@@ -43,15 +44,15 @@ class Prompter:
             elif ctx.triggered_id == "decline-button":
                 _global_button_clicked = "decline"
             elif ctx.triggered_id is None:
-                pass # On reload, no button is clicked
+                pass  # On reload, no button is clicked
             else:
                 # Raised exceptions are not shown in the console, but prints are
                 print(f"Invalid trigger: {ctx.triggered_id}")
-        
+
         @self.app.callback(
-            Output('prev-statements', 'children'),
-            Output('curr-statements', 'children'),
-            Input('interval-component', 'n_intervals'),
+            Output("prev-statements", "children"),
+            Output("curr-statements", "children"),
+            Input("interval-component", "n_intervals"),
         )
         def update_layout(n_intervals: int):
             prev_statements = self.app.layout["prev-statements"]
@@ -75,34 +76,51 @@ class Prompter:
         and the right division should contain the current statements.
         """
 
-        return html.Div([
-            dcc.Interval(
-                id='interval-component',
-                interval=update_interval_ms,
-                n_intervals=0
-            ),
-
-            html.Div([
-                html.Div([
-                dbc.Button("Decline", id="decline-button", n_clicks=0, style={"backgroundColor": "#d9534f"}),
-                ], className="col"),
-                html.Div([
-                dbc.Button("Accept", id="accept-button", n_clicks=0, style={"backgroundColor": "#5cb85c"}),
-                ], className="col"),
-            ], style={"textAlign": "center"}, className="row"),
-            html.Div([
-                html.Div([
-                    html.H5("Previously accepted"),
-                    html.Div(id="prev-statements"),
-                ], style={"flex": 1, "marginRight": "10px", "padding": "10px", "border": "1px solid #ccc"}),
-
-                html.Div([
-                    html.H5("New"),
-                    html.Div(id="curr-statements"),
-                ], style={"flex": 1, "marginLeft": "10px", "padding": "10px", "border": "1px solid #ccc"}),
-
-            ], style={"display": "flex", "margin": "10px"}, className="row"),
-        ], style={"padding": "10px"}, className="container")
+        return html.Div(
+            [
+                dcc.Interval(id="interval-component", interval=update_interval_ms, n_intervals=0),
+                html.Div(
+                    [
+                        html.Div(
+                            [
+                                dbc.Button("Decline", id="decline-button", n_clicks=0, style={"backgroundColor": "#d9534f"}),
+                            ],
+                            className="col",
+                        ),
+                        html.Div(
+                            [
+                                dbc.Button("Accept", id="accept-button", n_clicks=0, style={"backgroundColor": "#5cb85c"}),
+                            ],
+                            className="col",
+                        ),
+                    ],
+                    style={"textAlign": "center"},
+                    className="row",
+                ),
+                html.Div(
+                    [
+                        html.Div(
+                            [
+                                html.H5("Previously accepted"),
+                                html.Div(id="prev-statements"),
+                            ],
+                            style={"flex": 1, "marginRight": "10px", "padding": "10px", "border": "1px solid #ccc"},
+                        ),
+                        html.Div(
+                            [
+                                html.H5("New"),
+                                html.Div(id="curr-statements"),
+                            ],
+                            style={"flex": 1, "marginLeft": "10px", "padding": "10px", "border": "1px solid #ccc"},
+                        ),
+                    ],
+                    style={"display": "flex", "margin": "10px"},
+                    className="row",
+                ),
+            ],
+            style={"padding": "10px"},
+            className="container",
+        )
 
     def _render_statements_in_div(self, statements: List[Statement], div_id: str) -> None:
         rendered_statements: List[html.Div] = []
@@ -117,7 +135,7 @@ class Prompter:
 
         div = html.Div(rendered_statements, id=div_id)
         self.app.layout[div_id] = div
-    
+
     def _get_accept_decline(self) -> bool:
         global _global_button_clicked
 

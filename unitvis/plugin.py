@@ -1,17 +1,25 @@
+from pathlib import Path
+from typing import List, Tuple
+
 import pytest
 from _pytest.config.argparsing import Parser
 from _pytest.fixtures import FixtureRequest
-from typing import Tuple, List
-from pathlib import Path
-
 from plotly.graph_objs import Figure
-from unitvis.io import get_storage_path, read_statements, write_statements, clear_statements, Statement
-from unitvis.prompter import unitvis_prompter, Prompter
+
+from unitvis.io import (
+    Statement,
+    clear_statements,
+    get_storage_path,
+    read_statements,
+    write_statements,
+)
+from unitvis.prompter import Prompter, unitvis_prompter
+
 
 def pytest_addoption(parser: Parser):
     parser.addoption("--visualize", action="store_true", help="Run visualization tests, prompt for acceptance")
     parser.addoption("--visualize-yes-all", action="store_true", help="Visualization tests are accepted without prompting")
-    parser.addoption("--visualize-reset-all", action="store_true", help="Don't visualize, but mark all visualization cases as unaccepted")
+    parser.addoption("--visualize-reset-all", action="store_true", help="Don't visualize, but mark all visualization cases as unaccepted")  # fmt: skip
 
 
 @pytest.fixture

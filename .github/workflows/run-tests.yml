@@ -2,9 +2,9 @@ name: Run tests
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 permissions:
   contents: read
@@ -15,25 +15,25 @@ jobs:
 
     strategy:
       matrix:
-        python-version: [ "3.8", "3.12" ]
+        python-version: ["3.8", "3.12"]
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python-version }}
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-    - name: Install Plugin
-      run: |
-        RELEASE_VERSION=0.0.1 pip install -e .
+      - name: Install Plugin
+        run: |
+          RELEASE_VERSION=0.0.1 pip install -e .
 
-    - name: Test with pytest
-      run: |
-        pytest -vv
+      - name: Test with pytest
+        run: |
+          pytest -vv
