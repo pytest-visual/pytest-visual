@@ -1,12 +1,12 @@
 import threading
 import time
-from typing import List, Optional, Generator
+from typing import Generator, List, Optional
 
 import dash_bootstrap_components as dbc
 import plotly
 import pytest
-from dash import Dash, Input, Output, ctx, dcc, html
 from _pytest.fixtures import FixtureRequest
+from dash import Dash, Input, Output, ctx, dcc, html
 
 from unitvis.io import Statement
 from unitvis.utils import get_visualization_flags

@@ -5,7 +5,6 @@ import pytest
 from _pytest.config.argparsing import Parser
 from _pytest.fixtures import FixtureRequest
 from plotly.graph_objs import Figure
-from unitvis.utils import get_visualization_flags
 
 from unitvis.io import (
     Statement,
@@ -15,6 +14,7 @@ from unitvis.io import (
     write_statements,
 )
 from unitvis.prompter import Prompter, unitvis_prompter
+from unitvis.utils import get_visualization_flags
 
 
 def pytest_addoption(parser: Parser):
