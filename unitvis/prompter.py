@@ -1,6 +1,6 @@
 import threading
 import time
-from typing import List, Optional
+from typing import List, Optional, Generator
 
 import dash_bootstrap_components as dbc
 import plotly
@@ -12,17 +12,25 @@ from unitvis.io import Statement
 from unitvis.utils import get_visualization_flags
 
 plotly.io.templates.default = "plotly_white"
-update_interval_ms = 200
+
+# In seconds
+accept_decline_polling_interval = 0.1
+update_interval = 0.2
+finish_delay = 1.0
+
 
 _global_button_clicked: Optional[str] = None
 
 
 @pytest.fixture(scope="session")
-def unitvis_prompter(request: FixtureRequest) -> Optional["Prompter"]:
+def unitvis_prompter(request: FixtureRequest) -> Generator[Optional["Prompter"], None, None]:
     run_visualization, yes_all, reset_all = get_visualization_flags(request)
     if run_visualization:
-        return Prompter()
-    return None
+        prompter = Prompter()
+        yield prompter
+        prompter.teardown()
+    else:
+        yield None
 
 
 class Prompter:
@@ -63,6 +71,11 @@ class Prompter:
             curr_statements = self.app.layout["curr-statements"]
             return prev_statements.children, curr_statements.children
 
+    def teardown(self) -> None:
+        self._render_statements_in_div([], "prev-statements")
+        self._render_statements_in_div([], "curr-statements")
+        time.sleep(finish_delay)  # Wait for the layout to update
+
     def prompt_user(self, prev_statements: Optional[List[Statement]], curr_statements: List[Statement]) -> bool:
         if prev_statements is None:
             prev_statements = [["print", "No visualization cache"]]
@@ -82,7 +95,7 @@ class Prompter:
 
         return html.Div(
             [
-                dcc.Interval(id="interval-component", interval=update_interval_ms, n_intervals=0),
+                dcc.Interval(id="interval-component", interval=update_interval * 1000, n_intervals=0),
                 html.Div(
                     [
                         html.Div(
@@ -155,4 +168,4 @@ class Prompter:
                     _global_button_clicked = None
                     raise ValueError("Invalid button clicked value")
             else:
-                time.sleep(0.1)
+                time.sleep(accept_decline_polling_interval)
