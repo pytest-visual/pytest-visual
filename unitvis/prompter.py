@@ -1,3 +1,4 @@
+import logging
 import threading
 import time
 from typing import Generator, List, Optional
@@ -10,6 +11,8 @@ from dash import Dash, Input, Output, ctx, dcc, html
 
 from unitvis.io import Statement
 from unitvis.utils import get_visualization_flags
+
+logging.basicConfig(level=logging.INFO)  # To see Dash url
 
 plotly.io.templates.default = "plotly_white"
 
