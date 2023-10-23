@@ -5,10 +5,11 @@ from typing import List, Optional
 import dash_bootstrap_components as dbc
 import plotly
 import pytest
-from dash import Dash, Input, Output, State, callback, ctx, dcc, html
-from flask import Flask
+from dash import Dash, Input, Output, ctx, dcc, html
+from _pytest.fixtures import FixtureRequest
 
 from unitvis.io import Statement
+from unitvis.utils import get_visualization_flags
 
 plotly.io.templates.default = "plotly_white"
 update_interval_ms = 200
@@ -17,8 +18,11 @@ _global_button_clicked: Optional[str] = None
 
 
 @pytest.fixture(scope="session")
-def unitvis_prompter() -> "Prompter":
-    return Prompter()
+def unitvis_prompter(request: FixtureRequest) -> Optional["Prompter"]:
+    run_visualization, yes_all, reset_all = get_visualization_flags(request)
+    if run_visualization:
+        return Prompter()
+    return None
 
 
 class Prompter:

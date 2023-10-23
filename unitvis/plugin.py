@@ -1,10 +1,11 @@
 from pathlib import Path
-from typing import List, Tuple
+from typing import List
 
 import pytest
 from _pytest.config.argparsing import Parser
 from _pytest.fixtures import FixtureRequest
 from plotly.graph_objs import Figure
+from unitvis.utils import get_visualization_flags
 
 from unitvis.io import (
     Statement,
@@ -24,7 +25,7 @@ def pytest_addoption(parser: Parser):
 
 @pytest.fixture
 def visualize(request: FixtureRequest, unitvis_prompter: Prompter):
-    run_visualization, yes_all, reset_all = _get_visualization_flags(request)
+    run_visualization, yes_all, reset_all = get_visualization_flags(request)
     visualizer = Visualize()
     storage_path = get_storage_path(request)
 
@@ -42,17 +43,6 @@ def visualize(request: FixtureRequest, unitvis_prompter: Prompter):
         _teardown_with_reset_all(storage_path)
     else:
         pytest.skip("Visualization is not enabled, add --visualize option to enable")
-
-
-def _get_visualization_flags(request: FixtureRequest) -> Tuple[bool, bool, bool]:
-    visualize = bool(request.config.getoption("--visualize"))
-    yes_all = bool(request.config.getoption("--visualize-yes-all"))
-    reset_all = bool(request.config.getoption("--visualize-reset-all"))
-
-    assert visualize + yes_all + reset_all <= 1, "Only one of --visualize, --visualize-yes-all, --visualize-reset-all can be set"
-
-    run_visualization = visualize or yes_all
-    return run_visualization, yes_all, reset_all
 
 
 def _teardown_with_yes_all(path: Path, statements: List[Statement]) -> None:
