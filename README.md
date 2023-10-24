@@ -1,53 +1,103 @@
-# Unitvis - ML visualization organization and automation framework
+# pytest-visual
+
+`pytest-visual` introduces the concept of visual testing to ML (with automated change detection!).
 
 ## Problem statement
 
-In ML code, visualizations are not only great for exploring the data or verifying the model performance, but also for debugging and verifying ML code. However, in pracice, these visualizations are poorly organized, and lack standardization. Such code is often spread across script files, separate functions, and sometimes just interleaved with training/inference code. This results in several problems:
+Most ML code is poorly tested. This is at least partially because a lot of ML code is very hard to test meaningfully.
 
-- **Outdated visualizations.** Because visualizations are usually only run when debugging something, they can easily get out of sync with the main codebase. When you finally try to use them, they often won't work.
-- **Visualizations won't catch bugs.** Because there's no notification/enforcement to visualize, it's often skipped.
-- **Visualizations are often only run on end-to-end code.** Lack of isolation makes debugging more time-consuming.
-- **Worse code clarity.** Visualizations are often interleaved with training/production code (perhaps within a comment block).
+For example, we can easily test whether an image data augmentation pipeline produces an image with the correct shape, but does the image also look realistic? And does augmentation produce enough variation? These tests might succeed, but that doesn't mean that your code works.
 
-## Solution - unit visualization
+## Solution - visual testing for ML
 
-**Unit visualization** is to visualization as **unit testing** is to running assert statements.
+`pytest-visual` aims to streamline the organization of visualizations in ML code, enhancing debugging, verification, and code clarity. It automatically detects changes in visualization outputs, presents them in your browser, and prompts for approval. Accepted changes are memorized and not prompted for again. As a result, your visualizations
 
-You organize your visualizations into "visualization cases", just as you might have test cases. These cases are pytest tests, but are marked with a `visualize` fixture, and run when you invoke `pytest --visualize`. The program asks for your approval on each case that has changed since the last invocation, or which you haven't yet approved. This way, you're not cluttered with unnecessary information, yet always get notified of a change. This results in:
-
-- **Up to date visualizations.** Every visualization is run every time you run `pytest --visualize`.
-- **Visualization will catch bugs.** Verifying only those cases that have changed makes catching bugs feasible.
-- **Visualizations are run on small portions of code.** Just as with good unit tests.
-- **Better code clarity.** No interleaving debug/visualization code with production code.
-
-`unitvis` is a `pytest` plugin, so it's usage is very familiar to those who have used `pytest` before.
+- **will actually catch bugs**, as changes won't go unnoticed.
+- **are always up to date**, as they're run on every `pytest-visual` invocation.
+- **won't clutter your production code**, as they're separated into test cases.
 
 ## Example
 
-Example:
+In this example, we demonstrate how to create a basic visual test case. We first create a Python file with a prefix `test_*` (eg. `test_visualization.py`), and add this function:
 
 ```python
+# `pytest-visual` accepts `plotly` figures
 import plotly.express as px
 
-def test_show_square(visualize):
+# `test_` prefix makes this a pytest test
+# `visual` argument makes this a visual test
+def test_show_square(visual):
+    # Plot the test data
     x, y = [0, 1, 2, 3, 4, 5], [0, 1, 4, 9, 16, 25]
     fig = px.scatter(x=x, y=y)
 
+    # You can have multiple print() and show() calls in a single case.
     visualize.print("Square plot")
     visualize.show(fig)
 ```
 
-Note that `visualize` test cases are skipped by default on `pytest`, but can be run with `pytest --visualize`.
+Then run `pytest --visualize`, and open the url displayed in the terminal window (most likely `http://127.0.0.1:8050`). If the visualization looks OK, click "Accept", and pytest should complete with success.
 
-The output is only printed, plotted, and asked for manual review, if something changes.
+![A before and after plot displayed side by side.](examples/screenshots/square_plot.png?raw=true "Title")
+
+## Installation
+
+```
+pip install pytest-visual
+```
 
 ## CLI usage
 
-With unitvis plugin, the following options are added to `pytest`:
+With `pytest-visual` plugin, the following options are added to `pytest`:
 
-- `pytest --visualize`
-  - Run pytest with visualization cases, and prompt user for manual review for all changed cases.
-- `pytest --visualize-yes-all`
-  - Everything is accepted without prompting.
-- `pytest --visualize-reset-all`
-  - Don't visualize, but mark all cases as unaccepted.
+| Command                     | Description                                                                                        |
+| --------------------------- | -------------------------------------------------------------------------------------------------- |
+| `pytest --visual`           | Run pytest with visual tests, and prompt user for manual review on all detected changed.           |
+| `pytest --visual-yes-all`   | Accept everything without prompting. Useful when you clone a repository or check out a new branch. |
+| `pytest --visual-reset-all` | Mark all cases as declined.                                                                        |
+
+## FAQ
+
+### Can I mix unit testing with visual testing?
+
+Yes. And this is exactly what you should be doing! Just omit the `visual` fixture, and it's a normal `pytest` test again.
+
+### Which parts of a typical ML codebase can be visually tested?
+
+Visual testing can be used to verify the correctness of
+
+- data loading and augmentation
+- synthetic data generation
+- NN model strutures
+- loss functions
+- learning rate schedules
+- detection algorithms
+- various filtering algorithms
+- etc.
+
+### My visual tests are flaky. Why?
+
+This is typically because your output is undeterministic. For example, plotting a loss over a short training run is probably not a good idea, as it will likely be different for each run. If you need it as a test, consider a normal unit test with some threshold for expected accuracy. Tiny floating point errors could lead to inconsistent output.
+
+That said, we're planning to make `pytest-visual` robust to small fluctuations in output.
+
+### Why even bother testing ML code?
+
+If you've implemented complex data processing logic, custom neural network architectures, advanced post processing steps, or tried to reproduce a paper, you know that bugs can take a very large part of the development effort. Reduced accuracy is often the only symptom of a bug. When conducting an ML experiment, it's typical to waste a lot of time on
+
+- debugging when your ML code contains a bug,
+- debugging when your ML code doesn't contain a bug, but you don't know this,
+- revisiting an idea, because you're not sure whether your experiment was correct,
+- dropping a good idea because your experiment contained a bug, but you don't know this.
+
+Proper testing, including visual testing, can avoid a large portion of these headaches.
+
+### Isn't automation the whole point of unit testing automation? Now we have a potentially lazy/irresponsible human in the loop, who can just blindly "accept" a test.
+
+Full automation is a of course a great, but even the tests that are automatically run are written by people. Test quality can vary a lot, and tests written by a lazy/irresponsible person probably won't catch many bugs. Just having unit tests won't magically fix your code, but they are a very efficient tool to enable *responsible* developers write reliable code.
+
+## Contributing
+
+Your help is greatly needed and appreciated! Given that the library is still in alpha, there will likely be a lot of changes. Thus the main focus is to get the core features right and fix bugs.
+
+We encourage you to contribute by submitting PRs to improve the library. Usually, the PR should link to an existing issue, where the solution idea has been proposed and discussed. In case of simple fixes, where you can clearly see the problem, you can also directly submit a PR.
