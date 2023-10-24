@@ -40,6 +40,8 @@ Then run `pytest --visualize`, and open the url displayed in the terminal window
 
 ![A before and after plot displayed side by side.](examples/screenshots/square_plot.png?raw=true "Title")
 
+There's a few examples in the `examples/` directory.
+
 ## Installation
 
 ```
@@ -101,3 +103,19 @@ Full automation is a of course a great, but even the tests that are automaticall
 Your help is greatly needed and appreciated! Given that the library is still in alpha, there will likely be a lot of changes. Thus the main focus is to get the core features right and fix bugs.
 
 We encourage you to contribute by submitting PRs to improve the library. Usually, the PR should link to an existing issue, where the solution idea has been proposed and discussed. In case of simple fixes, where you can clearly see the problem, you can also directly submit a PR.
+
+To get started with development, install all the required dependencies for development:
+
+```
+pip install -r requirements.txt && pip install -r requirements-dev.txt
+```
+
+The entry point for the plugin is `visual/plugin.py`, you should start exploring from that file. The code should be reasonably documented on the high level, and is quite short.
+
+Before submitting a PR, please
+
+1. Run non-visual tests with `pytest`
+2. Lint your code with `pre-commit run -a`, and ensure no errors persist
+3. Verify that `pytest-visual` still works end-to-end with `pytest --visual-reset-all && pytest --visual`, and try accepting and declining changes.
+
+Also, please verify that your function inputs and outputs are type-annotated unless there's a good reason not to do so.
