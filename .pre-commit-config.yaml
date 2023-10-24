@@ -78,6 +78,7 @@ repos:
     rev: v1.6.1
     hooks:
       - id: mypy
+        args: ["--ignore-missing-imports", "--check-untyped-defs"]
 
   # clean up unused imports
   - repo: https://github.com/hadialqattan/pycln
