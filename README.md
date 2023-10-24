@@ -40,7 +40,8 @@ Then run `pytest --visualize`, and open the url displayed in the terminal window
 
 ![A before and after plot displayed side by side.](examples/screenshots/square_plot.png?raw=true "Title")
 
-There's a few examples in the `examples/` directory.
+Here's a sample output from `examples/test_data_augmentation.py`:
+![A before and after image showing the effect of data augmentation on a picture of a dog.](examples/screenshots/data_augmentation.jpg?raw=true)
 
 ## Installation
 
