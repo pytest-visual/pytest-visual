@@ -46,7 +46,7 @@ Here's a sample output from `examples/test_data_augmentation.py`:
 ## Installation
 
 ```
-pip install pytest-visual
+pip install pytest-visual --upgrade
 ```
 
 ## CLI usage
