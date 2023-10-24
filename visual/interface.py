@@ -1,20 +1,35 @@
 from pathlib import Path
-from typing import List
+from typing import List, Generator, Tuple
 
 import pytest
 from _pytest.config.argparsing import Parser
 from _pytest.fixtures import FixtureRequest
 from plotly.graph_objs import Figure
 
-from visual.io import (
+from visual.storage import (
     Statement,
     clear_statements,
     get_storage_path,
     read_statements,
     write_statements,
 )
-from visual.prompter import Prompter, visual_prompter
+from visual.ui import UI, visual_UI
 from visual.utils import get_visualization_flags
+
+
+class VisualFixture:
+    def __init__(self):
+        """
+        Initializer for the VisualFixture class which collects print and show statements during a test.
+        These statements can be stored, loaded, compared, and visualized.
+        """
+        self.statements: List[Statement] = []
+
+    def print(self, text) -> None:
+        self.statements.append(["print", text])
+
+    def show(self, fig: Figure) -> None:
+        self.statements.append(["show", str(fig.to_json())])
 
 
 def pytest_addoption(parser: Parser):
@@ -24,32 +39,40 @@ def pytest_addoption(parser: Parser):
 
 
 @pytest.fixture
-def visualize(request: FixtureRequest, visual_prompter: Prompter):
+def visual(request: FixtureRequest, visual_UI: UI) -> Generator[VisualFixture, None, None]:
+    """
+    A pytest fixture that manages the visualization process during test execution.
+
+    Parameters:
+    - request (FixtureRequest): The current pytest request.
+    - visual_UI (UI): An instance of the UI class for user interaction.
+
+    Yields:
+    - VisualFixture: An object to collect visualization statements.
+    """
     run_visualization, yes_all, reset_all = get_visualization_flags(request)
-    visualizer = Visualize()
+    visualizer = VisualFixture()
     storage_path = get_storage_path(request)
 
     if run_visualization:
-        # Run test
-        yield visualizer
+        yield visualizer  # Run test
 
-        # Handle visualization
         statements = visualizer.statements
         if yes_all:
-            _teardown_with_yes_all(storage_path, statements)
+            _accept_changes(storage_path, statements)
         else:
-            _teardown_with_verification(visual_prompter, storage_path, statements)
+            _query_user_for_acceptance(visual_UI, storage_path, statements)
     elif reset_all:
-        _teardown_with_reset_all(storage_path)
+        _clear_cache(storage_path)
     else:
         pytest.skip("Visualization is not enabled, add --visual option to enable")
 
 
-def _teardown_with_yes_all(path: Path, statements: List[Statement]) -> None:
+def _accept_changes(path: Path, statements: List[Statement]) -> None:
     write_statements(path, statements)
 
 
-def _teardown_with_verification(prompter: Prompter, path: Path, statements: List[Statement]) -> None:
+def _query_user_for_acceptance(prompter: UI, path: Path, statements: List[Statement]) -> None:
     prev_statements = read_statements(path)
 
     if statements != prev_statements:
@@ -59,17 +82,6 @@ def _teardown_with_verification(prompter: Prompter, path: Path, statements: List
             pytest.fail("Visualizations were not accepted")
 
 
-def _teardown_with_reset_all(path: Path) -> None:
+def _clear_cache(path: Path) -> None:
     clear_statements(path)
     pytest.skip("Resetting visualization case as per --visualize-reset-all")
-
-
-class Visualize:
-    def __init__(self):
-        self.statements: List[Statement] = []
-
-    def print(self, text) -> None:
-        self.statements.append(["print", text])
-
-    def show(self, fig: Figure) -> None:
-        self.statements.append(["plot", str(fig.to_json())])

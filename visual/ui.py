@@ -9,7 +9,7 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 from dash import Dash, Input, Output, ctx, dcc, html
 
-from visual.io import Statement
+from visual.storage import Statement
 from visual.utils import get_visualization_flags
 
 logging.basicConfig(level=logging.INFO)  # To see Dash url
@@ -26,18 +26,28 @@ _global_button_clicked: Optional[str] = None
 
 
 @pytest.fixture(scope="session")
-def visual_prompter(request: FixtureRequest) -> Generator[Optional["Prompter"], None, None]:
+def visual_UI(request: FixtureRequest) -> Generator[Optional["UI"], None, None]:
+    """
+    A pytest fixture that conditionally sets up and tears down a UI object for visualization purposes during testing.
+
+    The decision to yield a UI object or None is based on flags obtained from the test session configuration.
+    The UI object, if created, runs a Dash server in a separate thread for the duration of the test session.
+    """
     run_visualization, yes_all, reset_all = get_visualization_flags(request)
-    if run_visualization:
-        prompter = Prompter()
-        yield prompter
-        prompter.teardown()
-    else:
+    if run_visualization:  # Yield a UI object
+        ui = UI()
+        yield ui
+        ui.teardown()
+    else:  # No visualizations will be shown, so no need to start the heavy Dash server
         yield None
 
 
-class Prompter:
+class UI:
     def __init__(self) -> None:
+        """
+        Initializes the UI object, setting up the app, the layout, and starting a thread to run the server.
+        The callbacks for the interactive elements in the UI are also defined within this method.
+        """
         self.app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
         self.app.layout = self._draw_initial_layout()
 
@@ -52,6 +62,10 @@ class Prompter:
             Input("decline-button", "n_clicks"),
         )
         def on_button_click(accept_clicks: int, decline_clicks: int) -> None:
+            """
+            Callback function that is triggered when either the 'Accept' or 'Decline' button is clicked.
+            It modifies a global variable to reflect which button was clicked.
+            """
             global _global_button_clicked
 
             if ctx.triggered_id == "accept-button":
@@ -70,16 +84,26 @@ class Prompter:
             Input("interval-component", "n_intervals"),
         )
         def update_layout(n_intervals: int):
+            """
+            Callback function that updates the layout at specified intervals. 
+            This function keeps the UI updated in real-time.
+            """
             prev_statements = self.app.layout["prev-statements"]
             curr_statements = self.app.layout["curr-statements"]
             return prev_statements.children, curr_statements.children
 
     def teardown(self) -> None:
+        """
+        Cleans up the UI by removing all statements from the display and waiting for the layout to update.
+        """
         self._render_statements_in_div([], "prev-statements")
         self._render_statements_in_div([], "curr-statements")
         time.sleep(finish_delay)  # Wait for the layout to update
 
     def prompt_user(self, prev_statements: Optional[List[Statement]], curr_statements: List[Statement]) -> bool:
+        """
+        Prompts the user with statements for review and waits for user interaction (accept/decline).
+        """
         if prev_statements is None:
             prev_statements = [["print", "No visualization cache"]]
 
@@ -90,10 +114,7 @@ class Prompter:
 
     def _draw_initial_layout(self) -> html.Div:
         """
-        The layout contains accept/decline buttons at the top,
-        and two horizontally separated divisions below it.
-        The left division should contain the previous statements,
-        and the right division should contain the current statements.
+        Creates and returns the initial layout of the app, organizing the visual elements.
         """
 
         return html.Div(
@@ -143,11 +164,15 @@ class Prompter:
         )
 
     def _render_statements_in_div(self, statements: List[Statement], div_id: str) -> None:
+        """
+        Renders statements into a specified division in the UI.
+        Each statement could either be a print statement or a graphical (plotly) figure.
+        """
         rendered_statements: List[html.Div] = []
         for cmd, contents in statements:
             if cmd == "print":
                 rendered_statements.append(html.Div(contents))
-            elif cmd == "plot":
+            elif cmd == "show":
                 figure = plotly.io.from_json(contents)
                 rendered_statements.append(html.Div(dcc.Graph(figure=figure)))
             else:
@@ -157,6 +182,9 @@ class Prompter:
         self.app.layout[div_id] = div
 
     def _get_accept_decline(self) -> bool:
+        """
+        Waits for the user to click either 'Accept' or 'Decline', and returns a boolean value reflecting the choice.
+        """
         global _global_button_clicked
 
         while True:

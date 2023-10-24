@@ -6,7 +6,7 @@ import torchvision
 import torchvision.transforms as transforms
 from plotly.subplots import make_subplots
 
-from visual.plugin import Visualize
+from visual.interface import VisualFixture
 
 
 def augment(image: torch.Tensor) -> torch.Tensor:
@@ -26,7 +26,7 @@ def augment(image: torch.Tensor) -> torch.Tensor:
     return image
 
 
-def test_show_augmentations(visualize: Visualize):
+def test_show_augmentations(visual: VisualFixture):
     rows = 2
     cols = 3
 
@@ -61,5 +61,5 @@ def test_show_augmentations(visualize: Visualize):
     fig.update_layout(height=400)
 
     # Show the grid
-    visualize.print("Augmented images")
-    visualize.show(fig)
+    visual.print("Augmented images")
+    visual.show(fig)

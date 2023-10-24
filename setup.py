@@ -21,7 +21,7 @@ setup(
     name="pytest-visual",
     version=version,
     packages=find_packages(),
-    entry_points={"pytest11": ["visual = visual.plugin"]},
+    entry_points={"pytest11": ["visual = visual.interface"]},
     python_requires=">=3.8",
     install_requires=get_requirements(),
     long_description=open("README.md").read(),
