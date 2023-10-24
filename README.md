@@ -107,7 +107,7 @@ We encourage you to contribute by submitting PRs to improve the library. Usually
 To get started with development, install all the required dependencies for development:
 
 ```
-pip install -r requirements.txt && pip install -r requirements-dev.txt
+pip install -r requirements.txt && pip install -r requirements-dev.txt && pip install -e .
 ```
 
 The entry point for the plugin is `visual/plugin.py`, you should start exploring from that file. The code should be reasonably documented on the high level, and is quite short.

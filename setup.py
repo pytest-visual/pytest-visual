@@ -14,7 +14,7 @@ def get_requirements() -> List[str]:
     ]
 
 
-version = os.getenv("RELEASE_VERSION")
+version = os.getenv("RELEASE_VERSION", "0.0.1")
 assert version is not None, "RELEASE_VERSION environment variable must be set, this is typically done by the release pipeline."
 
 setup(

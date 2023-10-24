@@ -6,3 +6,4 @@ dist/
 .pytest-visual/
 
 Pipfile
+.python-version
