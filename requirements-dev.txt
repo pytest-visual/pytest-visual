@@ -1,5 +1,5 @@
 pre-commit>=3.0.0
 
--i https://download.pytorch.org/whl/cpu
+--extra-index-url https://download.pytorch.org/whl/cpu
 torchvision>=0.16
 torch>=2.0.0
