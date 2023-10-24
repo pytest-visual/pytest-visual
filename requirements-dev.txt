@@ -1,4 +1,4 @@
-pre-commit>=3.0.0
+pre-commit
 torchvision>=0.16
 
 --index-url https://download.pytorch.org/whl/cpu
