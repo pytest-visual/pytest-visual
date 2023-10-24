@@ -1,6 +1,6 @@
 import plotly.express as px
 
-from unitvis.plugin import Visualize
+from visual.plugin import Visualize
 
 
 def test_show_square(visualize: Visualize):

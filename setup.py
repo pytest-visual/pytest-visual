@@ -18,10 +18,10 @@ version = os.getenv("RELEASE_VERSION")
 assert version is not None, "RELEASE_VERSION environment variable must be set, this is typically done by the release pipeline."
 
 setup(
-    name="pytest-unitvis",
+    name="pytest-visual",
     version=version,
     packages=find_packages(),
-    entry_points={"pytest11": ["unitvis = unitvis.plugin"]},
+    entry_points={"pytest11": ["visual = visual.plugin"]},
     python_requires=">=3.8",
     install_requires=get_requirements(),
     long_description=open("README.md").read(),
@@ -29,7 +29,7 @@ setup(
     license="MIT",
     license_files=["LICENSE"],
     author="Kristjan Kongas",
-    url="https://github.com/kongaskristjan/pytest-unitvis",
+    url="https://github.com/kongaskristjan/pytest-visual",
     classifiers=[
         "Development Status :: 3 - Alpha",
         "License :: OSI Approved :: MIT License",

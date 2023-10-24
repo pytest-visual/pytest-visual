@@ -9,8 +9,8 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 from dash import Dash, Input, Output, ctx, dcc, html
 
-from unitvis.io import Statement
-from unitvis.utils import get_visualization_flags
+from visual.io import Statement
+from visual.utils import get_visualization_flags
 
 logging.basicConfig(level=logging.INFO)  # To see Dash url
 
@@ -26,7 +26,7 @@ _global_button_clicked: Optional[str] = None
 
 
 @pytest.fixture(scope="session")
-def unitvis_prompter(request: FixtureRequest) -> Generator[Optional["Prompter"], None, None]:
+def visual_prompter(request: FixtureRequest) -> Generator[Optional["Prompter"], None, None]:
     run_visualization, yes_all, reset_all = get_visualization_flags(request)
     if run_visualization:
         prompter = Prompter()

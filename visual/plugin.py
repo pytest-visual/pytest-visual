@@ -6,25 +6,25 @@ from _pytest.config.argparsing import Parser
 from _pytest.fixtures import FixtureRequest
 from plotly.graph_objs import Figure
 
-from unitvis.io import (
+from visual.io import (
     Statement,
     clear_statements,
     get_storage_path,
     read_statements,
     write_statements,
 )
-from unitvis.prompter import Prompter, unitvis_prompter
-from unitvis.utils import get_visualization_flags
+from visual.prompter import Prompter, visual_prompter
+from visual.utils import get_visualization_flags
 
 
 def pytest_addoption(parser: Parser):
-    parser.addoption("--visualize", action="store_true", help="Run visualization tests, prompt for acceptance")
-    parser.addoption("--visualize-yes-all", action="store_true", help="Visualization tests are accepted without prompting")
-    parser.addoption("--visualize-reset-all", action="store_true", help="Don't visualize, but mark all visualization cases as unaccepted")  # fmt: skip
+    parser.addoption("--visual", action="store_true", help="Run visualization tests, prompt for acceptance")
+    parser.addoption("--visual-yes-all", action="store_true", help="Visualization tests are accepted without prompting")
+    parser.addoption("--visual-reset-all", action="store_true", help="Don't visualize, but mark all visualization cases as unaccepted")  # fmt: skip
 
 
 @pytest.fixture
-def visualize(request: FixtureRequest, unitvis_prompter: Prompter):
+def visualize(request: FixtureRequest, visual_prompter: Prompter):
     run_visualization, yes_all, reset_all = get_visualization_flags(request)
     visualizer = Visualize()
     storage_path = get_storage_path(request)
@@ -38,11 +38,11 @@ def visualize(request: FixtureRequest, unitvis_prompter: Prompter):
         if yes_all:
             _teardown_with_yes_all(storage_path, statements)
         else:
-            _teardown_with_verification(unitvis_prompter, storage_path, statements)
+            _teardown_with_verification(visual_prompter, storage_path, statements)
     elif reset_all:
         _teardown_with_reset_all(storage_path)
     else:
-        pytest.skip("Visualization is not enabled, add --visualize option to enable")
+        pytest.skip("Visualization is not enabled, add --visual option to enable")
 
 
 def _teardown_with_yes_all(path: Path, statements: List[Statement]) -> None:

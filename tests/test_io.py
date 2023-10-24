@@ -2,8 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from unitvis.io import (
-    Statement,
+from visual.io import (
     clear_statements,
     get_storage_path,
     read_statements,
@@ -18,7 +17,7 @@ def get_storage_path_fixture(request) -> Path:
 
 def test_storage(get_storage_path_fixture: Path):
     storage_path = get_storage_path_fixture
-    assert storage_path == Path(".unitvis/tests/test_io.py/test_storage").absolute()
+    assert storage_path == Path(".pytest-visual/tests/test_io.py/test_storage").absolute()
 
     statements = [["print", "Hello world"]]
     write_statements(storage_path, statements)

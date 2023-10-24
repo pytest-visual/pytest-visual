@@ -13,7 +13,7 @@ def get_storage_path(request) -> Path:
     function_name = request.node.name
 
     relative_path = module_path.relative_to(root_path)
-    return root_path / ".unitvis" / relative_path / function_name
+    return root_path / ".pytest-visual" / relative_path / function_name
 
 
 def read_statements(storage_path: Path) -> Optional[List[Statement]]:

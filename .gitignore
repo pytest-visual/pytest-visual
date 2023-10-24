@@ -1,8 +1,8 @@
 __pycache__
 *.pyc
-pytest_unitvis.egg-info/
+pytest_visual.egg-info/
 dist/
 
-.unitvis/
+.pytest-visual/
 
 Pipfile
