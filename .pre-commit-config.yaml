@@ -72,7 +72,12 @@ repos:
       - id: codespell
         args:
           - --skip=logs/**,data/**,*.ipynb,*lock.json,video_intelligence_api*,ui-video-intelligence*
-          # - --ignore-words-list=abc,def
+
+  # python type checker
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.6.1
+    hooks:
+      - id: mypy
 
   # clean up unused imports
   - repo: https://github.com/hadialqattan/pycln
