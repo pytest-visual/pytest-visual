@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List, Generator, Tuple
+from typing import Generator, List
 
 import pytest
 from _pytest.config.argparsing import Parser

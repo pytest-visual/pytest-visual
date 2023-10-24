@@ -85,7 +85,7 @@ class UI:
         )
         def update_layout(n_intervals: int):
             """
-            Callback function that updates the layout at specified intervals. 
+            Callback function that updates the layout at specified intervals.
             This function keeps the UI updated in real-time.
             """
             prev_statements = self.app.layout["prev-statements"]
