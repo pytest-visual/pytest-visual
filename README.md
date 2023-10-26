@@ -43,11 +43,29 @@ Then run `pytest --visualize`, and open the url displayed in the terminal window
 Here's a sample output from `examples/test_data_augmentation.py`:
 ![A before and after image showing the effect of data augmentation on a picture of a dog.](examples/screenshots/data_augmentation.jpg?raw=true)
 
+See [Installation](#installation) for instructions on how to run these examples.
+
 ## Installation
 
-```
+`pytest-visual` can be installed with the following command:
+
+```bash
 pip install pytest-visual --upgrade
 ```
+
+In order to run examples in this repository, you also need development dependencies. You can install them with
+
+```bash
+pip install -r requirements-dev.txt
+```
+
+Then go to the root directory of this repository and run visualizations with
+
+```bash
+pytest --visual
+```
+
+and open your browser at the printed url. Do note that development dependencies are quite heavy (for example Pytorch CPU), but that's just the nature of most DL frameworks.
 
 ## CLI usage
 
@@ -107,7 +125,7 @@ We encourage you to contribute by submitting PRs to improve the library. Usually
 
 To get started with development, install all the required dependencies for development:
 
-```
+```bash
 pip install -r requirements.txt && pip install -r requirements-dev.txt && pip install -e .
 ```
 
