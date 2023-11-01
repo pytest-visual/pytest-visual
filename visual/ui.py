@@ -77,6 +77,7 @@ class UI:
             else:
                 # Raised exceptions are not shown in the console, but prints are
                 print(f"Invalid trigger: {ctx.triggered_id}")
+            return None, None
 
         @self.app.callback(
             Output("prev-statements", "children"),
