@@ -51,6 +51,8 @@ class UI:
         self.app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
         self.app.layout = self._draw_initial_layout()
 
+        self._render_blank()
+
         self.thread = threading.Thread(target=self.app.run_server, kwargs={"debug": False, "use_reloader": False})
         self.thread.daemon = True
         self.thread.start()
@@ -61,7 +63,7 @@ class UI:
             Input("accept-button", "n_clicks"),
             Input("decline-button", "n_clicks"),
         )
-        def on_button_click(accept_clicks: int, decline_clicks: int) -> None:
+        def on_button_click(accept_clicks: int, decline_clicks: int) -> tuple:
             """
             Callback function that is triggered when either the 'Accept' or 'Decline' button is clicked.
             It modifies a global variable to reflect which button was clicked.
@@ -80,6 +82,8 @@ class UI:
             return None, None
 
         @self.app.callback(
+            Output("file-name", "children"),
+            Output("function-name", "children"),
             Output("prev-statements", "children"),
             Output("curr-statements", "children"),
             Input("interval-component", "n_intervals"),
@@ -89,27 +93,41 @@ class UI:
             Callback function that updates the layout at specified intervals.
             This function keeps the UI updated in real-time.
             """
-            prev_statements = self.app.layout["prev-statements"]
-            curr_statements = self.app.layout["curr-statements"]
-            return prev_statements.children, curr_statements.children
+            return (
+                self.file_name.children,  # type: ignore
+                self.function_name.children,  # type: ignore
+                self.prev_statements.children,
+                self.curr_statements.children,
+            )
 
     def teardown(self) -> None:
         """
-        Cleans up the UI by removing all statements from the display and waiting for the layout to update.
+        Renders a blank UI and waits for the layout to update.
         """
-        self._render_statements_in_div([], "prev-statements")
-        self._render_statements_in_div([], "curr-statements")
+        self._render_blank()
         time.sleep(finish_delay)  # Wait for the layout to update
 
-    def prompt_user(self, prev_statements: Optional[List[Statement]], curr_statements: List[Statement]) -> bool:
+    def _render_blank(self) -> None:
+        """
+        Renders a blank UI, without any statements or buttons.
+        """
+        self._render_location(None)
+        self.prev_statements = self._render_statements_in_div([], "prev-statements")
+        self.curr_statements = self._render_statements_in_div([], "curr-statements")
+
+    def prompt_user(
+        self, location: "Location", prev_statements: Optional[List[Statement]], curr_statements: List[Statement]
+    ) -> bool:
         """
         Prompts the user with statements for review and waits for user interaction (accept/decline).
         """
+        self._render_location(location)
+
         if prev_statements is None:
             prev_statements = [["print", "No visualization cache"]]
 
-        self._render_statements_in_div(prev_statements, "prev-statements")
-        self._render_statements_in_div(curr_statements, "curr-statements")
+        self.prev_statements = self._render_statements_in_div(prev_statements, "prev-statements")
+        self.curr_statements = self._render_statements_in_div(curr_statements, "curr-statements")
 
         return self._get_accept_decline()
 
@@ -141,6 +159,13 @@ class UI:
                 ),
                 html.Div(
                     [
+                        html.H4("", id="file-name"),
+                        html.H4("", id="function-name"),
+                    ],
+                    style={"paddingBottom": "20px", "paddingTop": "20px"},
+                ),
+                html.Div(
+                    [
                         html.Div(
                             [
                                 html.H5("Previously accepted"),
@@ -164,11 +189,23 @@ class UI:
             className="container",
         )
 
-    def _render_statements_in_div(self, statements: List[Statement], div_id: str) -> None:
+    def _render_location(self, location: Optional["Location"]) -> None:
+        """
+        Renders the location of the test function into the UI.
+        """
+        if location is None:
+            location = Location("", "")
+
+        print("LOCATION FUNCTION AND FILE NAME:", location.function_name, location.file_name)
+        self.file_name = html.H4(f"File: {location.file_name}", id="file-name")
+        self.function_name = html.H4(f"Function: {location.function_name + '()' if location.function_name != '' else ''}", id="function-name")  # fmt: skip
+
+    def _render_statements_in_div(self, statements: List[Statement], div_id: str) -> html.Div:
         """
         Renders statements into a specified division in the UI.
         Each statement could either be a print statement or a graphical (plotly) figure.
         """
+
         rendered_statements: List[html.Div] = []
         for cmd, contents in statements:
             if cmd == "print":
@@ -180,7 +217,7 @@ class UI:
                 raise ValueError(f"Invalid command {cmd}")
 
         div = html.Div(rendered_statements, id=div_id)
-        self.app.layout[div_id] = div
+        return div
 
     def _get_accept_decline(self) -> bool:
         """
@@ -201,3 +238,9 @@ class UI:
                     raise ValueError("Invalid button clicked value")
             else:
                 time.sleep(accept_decline_polling_interval)
+
+
+class Location:
+    def __init__(self, file_name: str, function_name: str) -> None:
+        self.file_name = file_name
+        self.function_name = function_name

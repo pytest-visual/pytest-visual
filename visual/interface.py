@@ -13,7 +13,7 @@ from visual.storage import (
     read_statements,
     write_statements,
 )
-from visual.ui import UI, visual_UI
+from visual.ui import UI, Location, visual_UI
 from visual.utils import get_visualization_flags
 
 
@@ -61,7 +61,8 @@ def visual(request: FixtureRequest, visual_UI: UI) -> Generator[VisualFixture, N
         if yes_all:
             _accept_changes(storage_path, statements)
         else:
-            _query_user_for_acceptance(visual_UI, storage_path, statements)
+            location = Location(request.node.module.__file__, request.node.name)
+            _query_user_for_acceptance(location, visual_UI, storage_path, statements)
     elif reset_all:
         _clear_cache(storage_path)
     else:
@@ -72,11 +73,11 @@ def _accept_changes(path: Path, statements: List[Statement]) -> None:
     write_statements(path, statements)
 
 
-def _query_user_for_acceptance(prompter: UI, path: Path, statements: List[Statement]) -> None:
+def _query_user_for_acceptance(location: Location, prompter: UI, path: Path, statements: List[Statement]) -> None:
     prev_statements = read_statements(path)
 
     if statements != prev_statements:
-        if prompter.prompt_user(prev_statements, statements):
+        if prompter.prompt_user(location, prev_statements, statements):
             write_statements(path, statements)
         else:
             pytest.fail("Visualizations were not accepted")
