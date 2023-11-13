@@ -18,7 +18,7 @@ plotly.io.templates.default = "plotly_white"
 
 # In seconds
 accept_decline_polling_interval = 0.1
-update_interval = 0.2
+update_interval = 0.5
 finish_delay = 1.0
 
 
@@ -209,13 +209,27 @@ class UI:
         Each statement could either be a print statement or a graphical (plotly) figure.
         """
 
-        rendered_statements: List[html.Div] = []
+        code_style = {
+            "background-color": "#f8f8f8",
+            "border": "1px solid #999",
+            "display": "block",
+            "padding": "10px",
+            "border-radius": "5px",
+            "white-space": "pre-wrap",
+            "margin-top": "10px",
+            "margin-bottom": "10px",
+            "font-family": "monospace",
+            "color": "black",
+        }
+        plot_style = {"padding": "10px", "margin-top": "10px", "margin-bottom": "10px"}
+
+        rendered_statements: list = []
         for cmd, contents in statements:
             if cmd == "print":
-                rendered_statements.append(html.Div(contents))
+                rendered_statements.append(html.Code(contents, style=code_style))
             elif cmd == "show":
                 figure = plotly.io.from_json(contents)
-                rendered_statements.append(html.Div(dcc.Graph(figure=figure)))
+                rendered_statements.append(dbc.Card(dcc.Graph(figure=figure), style=plot_style))
             else:
                 raise ValueError(f"Invalid command {cmd}")
 
