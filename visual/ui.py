@@ -121,9 +121,6 @@ class UI:
         """
         self._render_location(location)
 
-        if prev_statements is None:
-            prev_statements = [["print", "No visualization cache"]]
-
         self.prev_statements = self._render_statements_in_div(prev_statements, "prev-statements")
         self.curr_statements = self._render_statements_in_div(curr_statements, "curr-statements")
 
@@ -203,7 +200,7 @@ class UI:
         ]
         self.file_name = dbc.CardHeader(element, id="file-name")
 
-    def _render_statements_in_div(self, statements: List[Statement], div_id: str) -> dbc.CardBody:
+    def _render_statements_in_div(self, statements: Optional[List[Statement]], div_id: str) -> dbc.CardBody:
         """
         Renders statements into a specified division in the UI.
         Each statement could either be a print statement or a graphical (plotly) figure.
@@ -224,14 +221,17 @@ class UI:
         plot_style = {"padding": "10px", "margin-top": "10px", "margin-bottom": "10px"}
 
         rendered_statements: list = []
-        for cmd, contents in statements:
-            if cmd == "print":
-                rendered_statements.append(html.Code(contents, style=code_style))
-            elif cmd == "show":
-                figure = plotly.io.from_json(contents)
-                rendered_statements.append(dbc.Card(dcc.Graph(figure=figure), style=plot_style))
-            else:
-                raise ValueError(f"Invalid command {cmd}")
+        if statements is None:
+            rendered_statements.append(html.P("No statements to display"))
+        else:
+            for cmd, contents in statements:
+                if cmd == "print":
+                    rendered_statements.append(html.Code(contents, style=code_style))
+                elif cmd == "show":
+                    figure = plotly.io.from_json(contents)
+                    rendered_statements.append(dbc.Card(dcc.Graph(figure=figure), style=plot_style))
+                else:
+                    raise ValueError(f"Invalid command {cmd}")
 
         div = dbc.CardBody(rendered_statements, id=div_id)
         return div
