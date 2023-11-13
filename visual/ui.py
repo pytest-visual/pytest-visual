@@ -83,7 +83,6 @@ class UI:
 
         @self.app.callback(
             Output("file-name", "children"),
-            Output("function-name", "children"),
             Output("prev-statements", "children"),
             Output("curr-statements", "children"),
             Input("interval-component", "n_intervals"),
@@ -95,7 +94,6 @@ class UI:
             """
             return (
                 self.file_name.children,  # type: ignore
-                self.function_name.children,  # type: ignore
                 self.prev_statements.children,
                 self.curr_statements.children,
             )
@@ -139,54 +137,56 @@ class UI:
         return html.Div(
             [
                 dcc.Interval(id="interval-component", interval=update_interval * 1000, n_intervals=0),
-                html.Div(
+                dbc.Card(
                     [
-                        html.Div(
+                        dbc.ListGroup(
                             [
-                                dbc.Button("Decline", id="decline-button", n_clicks=0, style={"backgroundColor": "#d9534f"}),
+                                dbc.CardHeader("", id="file-name"),
+                                dbc.CardGroup(
+                                    [
+                                        dbc.Card(
+                                            [
+                                                dbc.Button(
+                                                    "Decline",
+                                                    style={
+                                                        "backgroundColor": "#d9534f",
+                                                        "margin": "10px",
+                                                        "width": "100% - 20px",
+                                                    },
+                                                    id="decline-button",
+                                                    n_clicks=0,
+                                                ),  # fmt: skip
+                                                dbc.CardBody(id="prev-statements"),
+                                                dbc.CardFooter("Previously accepted", style={"textAlign": "center"}),
+                                            ],
+                                        ),
+                                        dbc.Card(
+                                            [
+                                                dbc.Button(
+                                                    "Accept",
+                                                    style={
+                                                        "backgroundColor": "#5cb85c",
+                                                        "margin": "10px",
+                                                        "width": "100% - 20px",
+                                                    },
+                                                    id="accept-button",
+                                                    n_clicks=0,
+                                                ),  # fmt: skip
+                                                dbc.CardBody(id="curr-statements"),
+                                                dbc.CardFooter("New", style={"textAlign": "center"}),
+                                            ],
+                                        ),
+                                    ],
+                                    style={"display": "flex", "margin": "10px"},
+                                ),
                             ],
-                            className="col",
-                        ),
-                        html.Div(
-                            [
-                                dbc.Button("Accept", id="accept-button", n_clicks=0, style={"backgroundColor": "#5cb85c"}),
-                            ],
-                            className="col",
+                            flush=True,
+                            style={"border": "1px solid #ccc"},
                         ),
                     ],
-                    style={"textAlign": "center"},
-                    className="row",
-                ),
-                html.Div(
-                    [
-                        html.H4("", id="file-name"),
-                        html.H4("", id="function-name"),
-                    ],
-                    style={"paddingBottom": "20px", "paddingTop": "20px"},
-                ),
-                html.Div(
-                    [
-                        html.Div(
-                            [
-                                html.H5("Previously accepted"),
-                                html.Div(id="prev-statements"),
-                            ],
-                            style={"flex": 1, "marginRight": "10px", "padding": "10px", "border": "1px solid #ccc"},
-                        ),
-                        html.Div(
-                            [
-                                html.H5("New"),
-                                html.Div(id="curr-statements"),
-                            ],
-                            style={"flex": 1, "marginLeft": "10px", "padding": "10px", "border": "1px solid #ccc"},
-                        ),
-                    ],
-                    style={"display": "flex", "margin": "10px"},
-                    className="row",
+                    style={"padding": "10px", "border": "0px"},
                 ),
             ],
-            style={"padding": "10px"},
-            className="container",
         )
 
     def _render_location(self, location: Optional["Location"]) -> None:
@@ -196,11 +196,14 @@ class UI:
         if location is None:
             location = Location("", "")
 
-        print("LOCATION FUNCTION AND FILE NAME:", location.function_name, location.file_name)
-        self.file_name = html.H4(f"File: {location.file_name}", id="file-name")
-        self.function_name = html.H4(f"Function: {location.function_name + '()' if location.function_name != '' else ''}", id="function-name")  # fmt: skip
+        element = [
+            f"File: {location.file_name}",
+            html.Br(),
+            f"Function: {location.function_name + '()' if location.function_name != '' else ''}",
+        ]
+        self.file_name = dbc.CardHeader(element, id="file-name")
 
-    def _render_statements_in_div(self, statements: List[Statement], div_id: str) -> html.Div:
+    def _render_statements_in_div(self, statements: List[Statement], div_id: str) -> dbc.CardBody:
         """
         Renders statements into a specified division in the UI.
         Each statement could either be a print statement or a graphical (plotly) figure.
@@ -216,7 +219,7 @@ class UI:
             else:
                 raise ValueError(f"Invalid command {cmd}")
 
-        div = html.Div(rendered_statements, id=div_id)
+        div = dbc.CardBody(rendered_statements, id=div_id)
         return div
 
     def _get_accept_decline(self) -> bool:
