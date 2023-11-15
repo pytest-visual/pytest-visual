@@ -2,10 +2,10 @@ from pathlib import Path
 from typing import Generator, List
 
 import pytest
-from _pytest.config.argparsing import Parser
 from _pytest.fixtures import FixtureRequest
 from plotly.graph_objs import Figure
 
+from visual.flags import get_visualization_flags, pytest_addoption
 from visual.storage import (
     Statement,
     clear_statements,
@@ -14,7 +14,6 @@ from visual.storage import (
     write_statements,
 )
 from visual.ui import UI, Location, visual_UI
-from visual.utils import get_visualization_flags
 
 
 class VisualFixture:
@@ -30,12 +29,6 @@ class VisualFixture:
 
     def show(self, fig: Figure) -> None:
         self.statements.append(["show", str(fig.to_json())])
-
-
-def pytest_addoption(parser: Parser):
-    parser.addoption("--visual", action="store_true", help="Run visualization tests, prompt for acceptance")
-    parser.addoption("--visual-yes-all", action="store_true", help="Visualization tests are accepted without prompting")
-    parser.addoption("--visual-reset-all", action="store_true", help="Don't visualize, but mark all visualization cases as unaccepted")  # fmt: skip
 
 
 @pytest.fixture
@@ -61,7 +54,7 @@ def visual(request: FixtureRequest, visual_UI: UI) -> Generator[VisualFixture, N
         if yes_all:
             _accept_changes(storage_path, statements)
         else:
-            location = Location(request.node.module.__file__, request.node.name)
+            location = Location(request.node.module.__file__, request.node.name)  # type: ignore
             _query_user_for_acceptance(location, visual_UI, storage_path, statements)
     elif reset_all:
         _clear_cache(storage_path)

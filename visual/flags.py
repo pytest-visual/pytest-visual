@@ -1,7 +1,13 @@
 from typing import Tuple
 
 from _pytest.fixtures import FixtureRequest
+from _pytest.config.argparsing import Parser
 
+
+def pytest_addoption(parser: Parser):
+    parser.addoption("--visual", action="store_true", help="Run visualization tests, prompt for acceptance")
+    parser.addoption("--visual-yes-all", action="store_true", help="Visualization tests are accepted without prompting")
+    parser.addoption("--visual-reset-all", action="store_true", help="Don't visualize, but mark all visualization cases as unaccepted")  # fmt: skip
 
 def get_visualization_flags(request: FixtureRequest) -> Tuple[bool, bool, bool]:
     """
