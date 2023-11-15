@@ -3,3 +3,4 @@ plotly>=5.0.0
 dash>=2.0.0
 dash_bootstrap_components>=1.0.0
 numpy>=1.17.0
+pandas>=2.0.0
