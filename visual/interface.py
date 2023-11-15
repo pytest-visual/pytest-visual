@@ -1,4 +1,3 @@
-from pathlib import Path
 from typing import Generator, List
 
 import pytest
@@ -51,31 +50,22 @@ def visual(request: FixtureRequest, visual_UI: UI) -> Generator[VisualFixture, N
         yield visualizer  # Run test
 
         statements = visualizer.statements
-        if yes_all:
-            _accept_changes(storage_path, statements)
-        else:
+
+        if not yes_all:
+            # Read previous statements
             location = Location(request.node.module.__file__, request.node.name)  # type: ignore
-            _query_user_for_acceptance(location, visual_UI, storage_path, statements)
+            prev_statements = read_statements(storage_path)
+
+            # Check if statements have changed, and prompt user if so
+            if statements != prev_statements:
+                if not visual_UI.prompt_user(location, prev_statements, statements):
+                    pytest.fail("Visualizations were not accepted")
+
+        # No declined changes or --visual-yes-all flag set, so accept changes
+        write_statements(storage_path, statements)
     elif reset_all:
-        _clear_cache(storage_path)
+        # Reset visualization
+        clear_statements(storage_path)
+        pytest.skip("Resetting visualization case as per --visualize-reset-all")
     else:
         pytest.skip("Visualization is not enabled, add --visual option to enable")
-
-
-def _accept_changes(path: Path, statements: List[Statement]) -> None:
-    write_statements(path, statements)
-
-
-def _query_user_for_acceptance(location: Location, prompter: UI, path: Path, statements: List[Statement]) -> None:
-    prev_statements = read_statements(path)
-
-    if statements != prev_statements:
-        if prompter.prompt_user(location, prev_statements, statements):
-            write_statements(path, statements)
-        else:
-            pytest.fail("Visualizations were not accepted")
-
-
-def _clear_cache(path: Path) -> None:
-    clear_statements(path)
-    pytest.skip("Resetting visualization case as per --visualize-reset-all")
