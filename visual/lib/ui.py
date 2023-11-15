@@ -9,8 +9,8 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 from dash import Dash, Input, Output, ctx, dcc, html
 
-from visual.flags import get_visualization_flags
-from visual.storage import Statement
+from visual.lib.flags import get_visualization_flags
+from visual.lib.storage import Statement
 
 logging.basicConfig(level=logging.INFO)  # To see Dash url
 

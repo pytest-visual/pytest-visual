@@ -5,15 +5,15 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 from plotly.graph_objs import Figure
 
-from visual.flags import get_visualization_flags, pytest_addoption
-from visual.storage import (
+from visual.lib.flags import get_visualization_flags, pytest_addoption
+from visual.lib.storage import (
     Statement,
     clear_statements,
     get_storage_path,
     read_statements,
     write_statements,
 )
-from visual.ui import UI, Location, visual_UI
+from visual.lib.ui import UI, Location, visual_UI
 
 
 class VisualFixture:

@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from visual.storage import (
+from visual.lib.storage import (
     clear_statements,
     get_storage_path,
     read_statements,
