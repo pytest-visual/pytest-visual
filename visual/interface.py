@@ -1,10 +1,17 @@
 import random
-from typing import Generator, List
+from typing import Generator, List, Optional, Tuple
 
+import numpy as np
 import pytest
 from _pytest.fixtures import FixtureRequest
 from plotly.graph_objs import Figure
 
+from visual.lib.convenience import (
+    create_plot_from_images,
+    get_grid_shape,
+    get_image_max_value_from_type,
+    get_layout_from_image,
+)
 from visual.lib.flags import get_visualization_flags, pytest_addoption
 from visual.lib.storage import (
     Statement,
@@ -15,22 +22,74 @@ from visual.lib.storage import (
 )
 from visual.lib.ui import UI, Location, visual_UI
 
-# Core interface
-
 
 class VisualFixture:
     def __init__(self):
         """
-        Initializer for the VisualFixture class which collects print and show statements during a test.
-        These statements can be stored, loaded, compared, and visualized.
+        An object to collect visualization statements.
         """
         self.statements: List[Statement] = []
 
-    def print(self, text) -> None:
+    # Core interface
+
+    def print(self, text: str) -> None:
+        """
+        Show text within a visualization case.
+
+        Parameters:
+        - text (str): The text to show.
+        """
         self.statements.append(["print", text])
 
     def show(self, fig: Figure) -> None:
+        """
+        Show a plotly figure within a visualization case.
+
+        Parameters:
+        - fig (Figure): The figure to show.
+        """
         self.statements.append(["show", str(fig.to_json())])
+
+    # Convenience interface
+
+    def show_images(
+        self,
+        images: List[np.ndarray],
+        grid_shape: Optional[Tuple[int, int]] = None,
+        layout: Optional[str] = None,
+        mean_denorm: Optional[List[float]] = None,
+        std_denorm: Optional[List[float]] = None,
+        min_value: float = 0,
+        max_value: Optional[float] = None,
+        height: int = 400,
+    ) -> None:
+        """
+        Convenience method to show a grid of images. Accepts only numpy arrays, but supports a
+        variety of shapes.
+
+        Parameters:
+        - images (List[np.ndarray]): A list of images to show.
+        - grid_shape (Optional[Tuple[int, int]]): The grid shape to use. If not specified, the grid
+            shape is determined automatically.
+        - layout (Optional[str]): The shape of the images. If not specified, the shape is
+            determined automatically. Supported shapes are "hwc", "chw", "hw", "1chw", "1hwc".
+        - mean_comp (Optional[List[float]]): The mean that was used to normalize the images, which
+            is used to denormalize the images. If not specified, the images are not denormalized.
+        - std_comp (Optional[List[float]]): The standard deviation that was used to normalize the
+            images, which is used to denormalize the images. If not specified, the images are not
+            denormalized.
+        - min_value (float): The assumed minimum value of the images.
+        - max_value (Optional[float]): The assumed maximum value of the images. If not specified,
+            the maximum value is 1 for float images and 255 for integer images.
+        """
+        assert all(isinstance(image, np.ndarray) for image in images), "Images must be numpy arrays"
+        assert len(images) > 0, "At least one image must be specified"
+
+        grid_shape = get_grid_shape(grid_shape, len(images))
+        layout = get_layout_from_image(layout, images[0])
+        max_value = get_image_max_value_from_type(max_value, images[0])
+        fig = create_plot_from_images(images, grid_shape, layout, mean_denorm, std_denorm, min_value, max_value, height)
+        self.show(fig)
 
 
 @pytest.fixture
@@ -72,9 +131,6 @@ def visual(request: FixtureRequest, visual_UI: UI) -> Generator[VisualFixture, N
         pytest.skip("Resetting visualization case as per --visualize-reset-all")
     else:
         pytest.skip("Visualization is not enabled, add --visual option to enable")
-
-
-# High level interface
 
 
 @pytest.fixture
