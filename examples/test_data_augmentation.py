@@ -1,4 +1,3 @@
-import random
 
 import plotly.express as px
 import torch
@@ -26,13 +25,9 @@ def augment(image: torch.Tensor) -> torch.Tensor:
     return image
 
 
-def test_show_augmentations(visual: VisualFixture):
+def test_show_augmentations(visual: VisualFixture, fix_seeds: None):
     rows = 2
     cols = 3
-
-    # Fix random seed to avoid needless changes
-    random.seed(2)
-    torch.manual_seed(2)
 
     # Load an image
     base_image = torchvision.io.read_image("examples/assets/english_springer.jpg")

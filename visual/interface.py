@@ -1,3 +1,4 @@
+import random
 from typing import Generator, List
 
 import pytest
@@ -13,6 +14,8 @@ from visual.lib.storage import (
     write_statements,
 )
 from visual.lib.ui import UI, Location, visual_UI
+
+# Core interface
 
 
 class VisualFixture:
@@ -69,3 +72,37 @@ def visual(request: FixtureRequest, visual_UI: UI) -> Generator[VisualFixture, N
         pytest.skip("Resetting visualization case as per --visualize-reset-all")
     else:
         pytest.skip("Visualization is not enabled, add --visual option to enable")
+
+
+# High level interface
+
+
+@pytest.fixture
+def fix_seeds() -> None:
+    """
+    A pytest fixture that fixes the random seeds of random, and optionally numpy, torch and tensorflow.
+    """
+    random.seed(0)
+
+    try:
+        import numpy as np
+
+        np.random.seed(0)
+    except ImportError:
+        pass
+
+    try:
+        import torch
+
+        torch.manual_seed(0)
+        torch.backends.cudnn.deterministic = True  # type: ignore
+        torch.backends.cudnn.benchmark = False  # type: ignore
+    except (ImportError, AttributeError):
+        pass
+
+    try:
+        import tensorflow as tf
+
+        tf.random.set_seed(0)
+    except ImportError:
+        pass
