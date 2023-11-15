@@ -19,8 +19,8 @@ def get_storage_path(request: FixtureRequest) -> Path:
     Returns:
     - Path: A Path object pointing to the location where the statements should be stored.
     """
-    root_path = Path(request.config.rootdir)
-    module_path = Path(request.node.module.__file__)
+    root_path = Path(request.config.rootdir)  # type: ignore
+    module_path = Path(request.node.module.__file__)  # type: ignore
     function_name = request.node.name
 
     relative_path = module_path.relative_to(root_path)
