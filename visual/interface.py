@@ -1,5 +1,5 @@
 import random
-from typing import Generator, List, Optional
+from typing import Generator, List, Optional, Union
 
 import numpy as np
 import pytest
@@ -8,6 +8,7 @@ from plotly.graph_objs import Figure
 
 from visual.lib.convenience import (
     create_plot_from_images,
+    correct_layout,
     get_grid_shape,
     get_image_max_value_from_type,
     get_layout_from_image,
@@ -57,41 +58,23 @@ class VisualFixture:
         images: List[np.ndarray],
         labels: Optional[List[str]] = None,
         max_cols: int = 3,
-        layout: Optional[str] = None,
-        mean_denorm: Optional[List[float]] = None,
-        std_denorm: Optional[List[float]] = None,
-        min_value: float = 0,
-        max_value: Optional[float] = None,
         height_per_row: int = 300,
     ) -> None:
         """
-        Convenience method to show a grid of images. Accepts only numpy arrays, but supports a
-        variety of shapes.
+        Convenience method to show a grid of images. Only accepts standardized numpy images.
 
         Parameters:
         - images (List[np.ndarray]): A list of images to show.
         - labels (Optional[List[str]]): A list of labels for each image.
         - max_cols (int): Maximum number of columns in the grid.
-        - layout (Optional[str]): The shape of the images. If not specified, the shape is
-            determined automatically. Supported shapes are "hwc", "chw", "hw", "1chw", "1hwc".
-        - mean_comp (Optional[List[float]]): The mean that was used to normalize the images, which
-            is used to denormalize the images. If not specified, the images are not denormalized.
-        - std_comp (Optional[List[float]]): The standard deviation that was used to normalize the
-            images, which is used to denormalize the images. If not specified, the images are not
-            denormalized.
-        - min_value (float): The assumed minimum value of the images.
-        - max_value (Optional[float]): The assumed maximum value of the images. If not specified,
-            the maximum value is 1 for float images and 255 for integer images.
         - height_per_row (int): The height of each row in the grid.
         """
         assert all(isinstance(image, np.ndarray) for image in images), "Images must be numpy arrays"
         assert len(images) > 0, "At least one image must be specified"
 
         grid_shape = get_grid_shape(len(images), max_cols)
-        layout = get_layout_from_image(layout, images[0])
-        max_value = get_image_max_value_from_type(max_value, images[0])
         fig = create_plot_from_images(
-            images, labels, grid_shape, layout, mean_denorm, std_denorm, min_value, max_value, height_per_row * grid_shape[0]
+            images, labels, grid_shape, height_per_row * grid_shape[0]
         )
         self.show(fig)
 
@@ -113,7 +96,12 @@ def visual(request: FixtureRequest, visual_UI: UI) -> Generator[VisualFixture, N
     storage_path = get_storage_path(request)
 
     if run_visualization:
+        failed_tests1 = request.session.testsfailed
         yield visualizer  # Run test
+        failed_tests2 = request.session.testsfailed
+
+        if failed_tests2 > failed_tests1:
+            return  # Test failed, so no visualization
 
         statements = visualizer.statements
 
@@ -136,6 +124,7 @@ def visual(request: FixtureRequest, visual_UI: UI) -> Generator[VisualFixture, N
     else:
         pytest.skip("Visualization is not enabled, add --visual option to enable")
 
+# Convenience features
 
 @pytest.fixture
 def fix_seeds() -> None:
@@ -166,3 +155,39 @@ def fix_seeds() -> None:
         tf.random.set_seed(0)
     except ImportError:
         pass
+
+def standardize(
+    image: np.ndarray,
+    layout: Optional[str] = None,
+    mean_denorm: Optional[List[float]] = None,
+    std_denorm: Optional[List[float]] = None,
+    min_value: float = 0,
+    max_value: Optional[float] = None,
+) -> np.ndarray:
+    """
+        - layout (Optional[str]): The shape of the images. If not specified, the shape is
+            determined automatically. Supported shapes are "hwc", "chw", "hw", "1chw", "1hwc".
+        - mean_comp (Optional[List[float]]): The mean that was used to normalize the images, which
+            is used to denormalize the images. If not specified, the images are not denormalized.
+        - std_comp (Optional[List[float]]): The standard deviation that was used to normalize the
+            images, which is used to denormalize the images. If not specified, the images are not
+            denormalized.
+        - min_value (float): The assumed minimum value of the images.
+        - max_value (Optional[float]): The assumed maximum value of the images. If not specified,
+            the maximum value is 1 for float images and 255 for integer images.
+    """
+
+    # Get layout and max value
+    layout = get_layout_from_image(layout, image)
+    max_value = get_image_max_value_from_type(max_value, image)
+
+    # Denormalize, convert to uint8, and correct layout
+    image = correct_layout(image, layout)
+    if std_denorm is not None:
+        image = image * np.array(std_denorm)
+    if mean_denorm is not None:
+        image = image + mean_denorm
+    image = (image - min_value) / (max_value - min_value) * 255
+    image = np.clip(image, 0, 255).astype(np.uint8)
+
+    return image

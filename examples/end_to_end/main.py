@@ -1,7 +1,7 @@
 import math
 import random
 from pathlib import Path
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 
 import torch
 import torch.nn as nn
@@ -76,12 +76,15 @@ class ClockCoordinateDataset(Dataset[Tuple[Tensor, Tensor]]):
         self.clock_dataset = ClockDataset(data_dir)
         self.augment = augment
 
-    def __getitem__(self, index: int) -> Tuple[Tensor, Tensor]:
+    def __getitem__(self, index: int) -> Tuple[Tensor, Dict[str, Tensor]]:
         image, label = self.clock_dataset[index]
         coords = label.get_coords()
         if self.augment:
             image, coords = augment(image, coords)
         return image, coords
+    
+    def __len__(self) -> int:
+        return len(self.clock_dataset)
 
 
 class Time:
@@ -104,13 +107,13 @@ class Time:
 
         return Time(hour, minute)
 
-    def get_coords(self) -> Tensor:
+    def get_coords(self) -> Dict[str, Tensor]:
         # Return a tensor of shape (4,) with the coordinates of the hour and minute hands.
         hour_angle = 2 * math.pi * (self.hour % 12) / 12
         hour_xy = (math.sin(hour_angle), math.cos(hour_angle))
         minute_angle = 2 * math.pi * self.minute / 60
         minute_xy = (math.sin(minute_angle), math.cos(minute_angle))
-        return Tensor([*hour_xy, *minute_xy])
+        return {"hours": Tensor(hour_xy), "minutes": Tensor(minute_xy)}
 
     def approx_eq(self, other: "Time", max_diff_minutes: int = 5) -> bool:
         first = self.hour * 60 + self.minute
@@ -119,6 +122,11 @@ class Time:
 
     def __repr__(self) -> str:
         return f"{self.hour:02}:{self.minute:02}"
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Time):
+            return False
+        return self.hour == other.hour and self.minute == other.minute
 
 
 def normalize_image(image: Tensor) -> Tensor:
@@ -137,8 +145,8 @@ def get_label(path: Path) -> Time:
 # Data augmentation
 
 
-def augment(image: Tensor, label: Tensor) -> Tuple[Tensor, Tensor]:
-    hour_xy, minute_xy = label.reshape(2, 2)
+def augment(image: Tensor, label: Dict[str, Tensor]) -> Tuple[Tensor, Dict[str, Tensor]]:
+    hour_xy, minute_xy = label["hours"], label["minutes"]
 
     # Randomly flip horizontally
     if random.random() > 0.5:
@@ -168,7 +176,7 @@ def augment(image: Tensor, label: Tensor) -> Tuple[Tensor, Tensor]:
     saturation_factor = random.uniform(0.8, 1.2)
     image = F.adjust_saturation(image, saturation_factor)
 
-    return image, torch.cat([hour_xy, minute_xy])
+    return image, {"hours": hour_xy, "minutes": minute_xy}
 
 
 # Model

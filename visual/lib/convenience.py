@@ -67,11 +67,6 @@ def create_plot_from_images(
     images: List[np.ndarray],
     labels: Optional[List[str]],
     grid_shape: Tuple[int, int],
-    layout: str,
-    mean_denorm: Optional[List[float]],
-    std_denorm: Optional[List[float]],
-    min_value: float,
-    max_value: float,
     height: float,
 ) -> Figure:
     if labels is not None:
@@ -85,13 +80,6 @@ def create_plot_from_images(
             i = r * cols + c
             if i < len(images):
                 image = images[i]
-
-                # Denormalize, convert to uint8, and correct layout
-                image = correct_layout(image, layout)
-                if mean_denorm is not None and std_denorm is not None:
-                    image = image * std_denorm + mean_denorm
-                image = (image - min_value) / (max_value - min_value) * 255
-                image = np.clip(image, 0, 255).astype(np.uint8)
 
                 # Add image to grid
                 subfig = px.imshow(image, binary_string=True)
