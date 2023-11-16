@@ -65,6 +65,7 @@ def get_image_max_value_from_type(max_value: Optional[float], image: np.ndarray)
 
 def create_plot_from_images(
     images: List[np.ndarray],
+    labels: Optional[List[str]],
     grid_shape: Tuple[int, int],
     layout: str,
     mean_denorm: Optional[List[float]],
@@ -73,6 +74,8 @@ def create_plot_from_images(
     max_value: float,
     height: float,
 ) -> Figure:
+    if labels is not None:
+        assert len(labels) == len(images), "Number of labels must match number of images"
     rows, cols = grid_shape
 
     # Create multiple augmented images and add them to a grid
@@ -95,6 +98,22 @@ def create_plot_from_images(
                 fig.update_layout(margin=dict(l=0, r=0, b=0, t=0))
                 fig.add_trace(subfig.data[0], row=r + 1, col=c + 1)
 
+                # Add label to image
+                if labels is not None:
+                    # Add white background to text
+                    fig.add_annotation(
+                        xref="paper",
+                        yref="paper",
+                        x=0.5 * image.shape[1],
+                        y=0.9 * image.shape[0],
+                        text=labels[i],
+                        showarrow=False,
+                        font=dict(size=15, color="black"),
+                        align="center",
+                        bgcolor="white",
+                        row=r + 1,
+                        col=c + 1,
+                    )
     # Remove axes
     for r in range(rows):
         for c in range(cols):

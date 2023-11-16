@@ -8,7 +8,7 @@ from visual.interface import VisualFixture
 def augment(image: torch.Tensor) -> torch.Tensor:
     transform = transforms.Compose(
         [
-            transforms.Resize((224, 224), antialias=True),
+            transforms.Resize((224, 224), antialias=True),  # type: ignore
             transforms.Pad(20, padding_mode="reflect"),
             transforms.RandomHorizontalFlip(),
             transforms.RandomRotation(15),
@@ -25,6 +25,7 @@ def augment(image: torch.Tensor) -> torch.Tensor:
 def test_show_augmentations(visual: VisualFixture, fix_seeds: None):
     base_image = torchvision.io.read_image("examples/assets/english_springer.jpg")
     augmented = [augment(base_image).numpy() for _ in range(6)]
+    labels = [f"Doge {i}" for i in range(1, 7)]
 
     visual.print("Augmented images")
-    visual.show_images(augmented)
+    visual.show_images(augmented, labels=labels)

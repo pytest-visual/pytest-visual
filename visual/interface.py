@@ -55,6 +55,7 @@ class VisualFixture:
     def show_images(
         self,
         images: List[np.ndarray],
+        labels: Optional[List[str]] = None,
         max_cols: int = 3,
         layout: Optional[str] = None,
         mean_denorm: Optional[List[float]] = None,
@@ -69,6 +70,7 @@ class VisualFixture:
 
         Parameters:
         - images (List[np.ndarray]): A list of images to show.
+        - labels (Optional[List[str]]): A list of labels for each image.
         - max_cols (int): Maximum number of columns in the grid.
         - layout (Optional[str]): The shape of the images. If not specified, the shape is
             determined automatically. Supported shapes are "hwc", "chw", "hw", "1chw", "1hwc".
@@ -89,7 +91,7 @@ class VisualFixture:
         layout = get_layout_from_image(layout, images[0])
         max_value = get_image_max_value_from_type(max_value, images[0])
         fig = create_plot_from_images(
-            images, grid_shape, layout, mean_denorm, std_denorm, min_value, max_value, height_per_row * grid_shape[0]
+            images, labels, grid_shape, layout, mean_denorm, std_denorm, min_value, max_value, height_per_row * grid_shape[0]
         )
         self.show(fig)
 
