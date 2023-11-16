@@ -87,11 +87,11 @@ def create_plot_from_images(
                 image = images[i]
 
                 # Denormalize, convert to uint8, and correct layout
+                image = correct_layout(image, layout)
                 if mean_denorm is not None and std_denorm is not None:
                     image = image * std_denorm + mean_denorm
                 image = (image - min_value) / (max_value - min_value) * 255
                 image = np.clip(image, 0, 255).astype(np.uint8)
-                image = correct_layout(image, layout)
 
                 # Add image to grid
                 subfig = px.imshow(image, binary_string=True)
@@ -114,6 +114,7 @@ def create_plot_from_images(
                         row=r + 1,
                         col=c + 1,
                     )
+
     # Remove axes
     for r in range(rows):
         for c in range(cols):

@@ -62,7 +62,7 @@ class VisualFixture:
         std_denorm: Optional[List[float]] = None,
         min_value: float = 0,
         max_value: Optional[float] = None,
-        height_per_row: int = 200,
+        height_per_row: int = 300,
     ) -> None:
         """
         Convenience method to show a grid of images. Accepts only numpy arrays, but supports a

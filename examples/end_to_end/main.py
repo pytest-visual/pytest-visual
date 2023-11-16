@@ -14,6 +14,7 @@ from torchvision.models import resnet18
 
 data_dir = Path("data")
 models_dir = Path("models")
+mean_norm, std_norm = [0.485, 0.456, 0.406], [0.229, 0.224, 0.225]
 
 
 def main() -> None:
@@ -55,7 +56,7 @@ class ClockDataset(Dataset[Tuple[Tensor, "Time"]]):
         path = self.paths[index]
 
         image = Image.open(path)
-        image_tensor = F.to_image_tensor(image)
+        image_tensor = F.to_image(image).to(torch.float32) / 255  # type: ignore
         image_tensor = normalize_image(image_tensor)
         label = get_label(path)
 
@@ -117,11 +118,11 @@ class Time:
         return abs(first - second) <= max_diff_minutes or abs(first - second) >= 24 * 60 - max_diff_minutes
 
     def __repr__(self) -> str:
-        return f"{self.hour}:{self.minute}"
+        return f"{self.hour:02}:{self.minute:02}"
 
 
 def normalize_image(image: Tensor) -> Tensor:
-    return F.normalize(image, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+    return F.normalize(image, mean=mean_norm, std=std_norm)
 
 
 def get_label(path: Path) -> Time:
