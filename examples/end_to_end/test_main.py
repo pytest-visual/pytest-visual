@@ -36,6 +36,7 @@ def test_with_hands(visual: VisualFixture, fix_seeds):
     visual.print("Dataset with hands drawn:")
     visualize_dataset(visual, dataset_non_aug)
 
+
 def test_augmented_with_hands(visual: VisualFixture, fix_seeds):
     dataset_aug = ClockCoordinateDataset(test_data_path / "train", augment=True)
     visual.print("Augmented dataset with hands drawn:")
