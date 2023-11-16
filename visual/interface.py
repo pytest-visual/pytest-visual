@@ -1,5 +1,5 @@
 import random
-from typing import Generator, List, Optional, Union
+from typing import Generator, List, Optional
 
 import numpy as np
 import pytest
@@ -7,8 +7,8 @@ from _pytest.fixtures import FixtureRequest
 from plotly.graph_objs import Figure
 
 from visual.lib.convenience import (
-    create_plot_from_images,
     correct_layout,
+    create_plot_from_images,
     get_grid_shape,
     get_image_max_value_from_type,
     get_layout_from_image,
@@ -73,9 +73,7 @@ class VisualFixture:
         assert len(images) > 0, "At least one image must be specified"
 
         grid_shape = get_grid_shape(len(images), max_cols)
-        fig = create_plot_from_images(
-            images, labels, grid_shape, height_per_row * grid_shape[0]
-        )
+        fig = create_plot_from_images(images, labels, grid_shape, height_per_row * grid_shape[0])
         self.show(fig)
 
 
@@ -124,7 +122,9 @@ def visual(request: FixtureRequest, visual_UI: UI) -> Generator[VisualFixture, N
     else:
         pytest.skip("Visualization is not enabled, add --visual option to enable")
 
+
 # Convenience features
+
 
 @pytest.fixture
 def fix_seeds() -> None:
@@ -156,6 +156,7 @@ def fix_seeds() -> None:
     except ImportError:
         pass
 
+
 def standardize(
     image: np.ndarray,
     layout: Optional[str] = None,
@@ -165,16 +166,16 @@ def standardize(
     max_value: Optional[float] = None,
 ) -> np.ndarray:
     """
-        - layout (Optional[str]): The shape of the images. If not specified, the shape is
-            determined automatically. Supported shapes are "hwc", "chw", "hw", "1chw", "1hwc".
-        - mean_comp (Optional[List[float]]): The mean that was used to normalize the images, which
-            is used to denormalize the images. If not specified, the images are not denormalized.
-        - std_comp (Optional[List[float]]): The standard deviation that was used to normalize the
-            images, which is used to denormalize the images. If not specified, the images are not
-            denormalized.
-        - min_value (float): The assumed minimum value of the images.
-        - max_value (Optional[float]): The assumed maximum value of the images. If not specified,
-            the maximum value is 1 for float images and 255 for integer images.
+    - layout (Optional[str]): The shape of the images. If not specified, the shape is
+        determined automatically. Supported shapes are "hwc", "chw", "hw", "1chw", "1hwc".
+    - mean_comp (Optional[List[float]]): The mean that was used to normalize the images, which
+        is used to denormalize the images. If not specified, the images are not denormalized.
+    - std_comp (Optional[List[float]]): The standard deviation that was used to normalize the
+        images, which is used to denormalize the images. If not specified, the images are not
+        denormalized.
+    - min_value (float): The assumed minimum value of the images.
+    - max_value (Optional[float]): The assumed maximum value of the images. If not specified,
+        the maximum value is 1 for float images and 255 for integer images.
     """
 
     # Get layout and max value

@@ -1,7 +1,7 @@
 import math
 import random
 from pathlib import Path
-from typing import List, Tuple, Dict
+from typing import Dict, List, Tuple
 
 import torch
 import torch.nn as nn
@@ -44,20 +44,22 @@ class ClockDataset(Dataset[Tuple[Tensor, "Time"]]):
     Dataset for clock images. The labels are Time objects representing the time shown on the clock.
     """
 
-    def __init__(self, data_dir: Path):
+    def __init__(self, data_dir: Path, normalize: bool = True):
         super().__init__()
         self.paths = []
         for pth in data_dir.glob("*"):
             if pth.is_file():
                 self.paths.append(pth)
         self.paths = sorted(self.paths)
+        self.normalize = normalize
 
     def __getitem__(self, index: int) -> Tuple[Tensor, "Time"]:
         path = self.paths[index]
 
         image = Image.open(path)
         image_tensor = F.to_image(image).to(torch.float32) / 255  # type: ignore
-        image_tensor = normalize_image(image_tensor)
+        if self.normalize:
+            image_tensor = normalize_image(image_tensor)
         label = get_label(path)
 
         return image_tensor, label
@@ -73,7 +75,7 @@ class ClockCoordinateDataset(Dataset[Tuple[Tensor, Tensor]]):
 
     def __init__(self, data_dir: Path, augment: bool = False):
         super().__init__()
-        self.clock_dataset = ClockDataset(data_dir)
+        self.clock_dataset = ClockDataset(data_dir, normalize=False)
         self.augment = augment
 
     def __getitem__(self, index: int) -> Tuple[Tensor, Dict[str, Tensor]]:
@@ -81,8 +83,9 @@ class ClockCoordinateDataset(Dataset[Tuple[Tensor, Tensor]]):
         coords = label.get_coords()
         if self.augment:
             image, coords = augment(image, coords)
+        image = normalize_image(image)
         return image, coords
-    
+
     def __len__(self) -> int:
         return len(self.clock_dataset)
 
@@ -109,11 +112,11 @@ class Time:
 
     def get_coords(self) -> Dict[str, Tensor]:
         # Return a tensor of shape (4,) with the coordinates of the hour and minute hands.
-        hour_angle = 2 * math.pi * (self.hour % 12) / 12
-        hour_xy = (math.sin(hour_angle), math.cos(hour_angle))
+        hour_angle = 2 * math.pi * (self.hour + self.minute / 60) / 12
+        hour_xy = (math.sin(hour_angle), -math.cos(hour_angle))
         minute_angle = 2 * math.pi * self.minute / 60
-        minute_xy = (math.sin(minute_angle), math.cos(minute_angle))
-        return {"hours": Tensor(hour_xy), "minutes": Tensor(minute_xy)}
+        minute_xy = (math.sin(minute_angle), -math.cos(minute_angle))
+        return {"hour": Tensor(hour_xy), "minute": Tensor(minute_xy)}
 
     def approx_eq(self, other: "Time", max_diff_minutes: int = 5) -> bool:
         first = self.hour * 60 + self.minute
@@ -146,7 +149,7 @@ def get_label(path: Path) -> Time:
 
 
 def augment(image: Tensor, label: Dict[str, Tensor]) -> Tuple[Tensor, Dict[str, Tensor]]:
-    hour_xy, minute_xy = label["hours"], label["minutes"]
+    hour_xy, minute_xy = label["hour"], label["minute"]
 
     # Randomly flip horizontally
     if random.random() > 0.5:
@@ -176,7 +179,7 @@ def augment(image: Tensor, label: Dict[str, Tensor]) -> Tuple[Tensor, Dict[str, 
     saturation_factor = random.uniform(0.8, 1.2)
     image = F.adjust_saturation(image, saturation_factor)
 
-    return image, {"hours": hour_xy, "minutes": minute_xy}
+    return image, {"hour": hour_xy, "minute": minute_xy}
 
 
 # Model
