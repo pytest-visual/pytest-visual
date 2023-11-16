@@ -14,6 +14,7 @@ from visual.lib.storage import Statement
 
 logging.basicConfig(level=logging.INFO)  # To see Dash url
 
+port_number = 54545
 plotly.io.templates.default = "plotly_white"
 
 # In seconds
@@ -21,8 +22,11 @@ accept_decline_polling_interval = 0.1
 update_interval = 0.5
 finish_delay = 1.0
 
-
 _global_button_clicked: Optional[str] = None
+
+print()
+print(f"-----  Visualizations will be shown at http://127.0.0.1:{port_number}  -----")
+print()
 
 
 @pytest.fixture(scope="session")
@@ -53,7 +57,9 @@ class UI:
 
         self._render_blank()
 
-        self.thread = threading.Thread(target=self.app.run_server, kwargs={"debug": False, "use_reloader": False})
+        self.thread = threading.Thread(
+            target=self.app.run_server, kwargs={"debug": False, "use_reloader": False, "port": port_number}
+        )
         self.thread.daemon = True
         self.thread.start()
 

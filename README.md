@@ -36,7 +36,7 @@ def test_show_square(visual):
     visualize.show(fig)
 ```
 
-Then run `pytest --visualize`, and open the url displayed in the terminal window (most likely `http://127.0.0.1:8050`). If the visualization looks OK, click "Accept", and pytest should complete with success.
+Then run `pytest --visualize`, and open the url displayed in the terminal window (most likely `http://127.0.0.1:54545`). If the visualization looks OK, click "Accept", and pytest should complete with success.
 
 ![A before and after plot displayed side by side.](examples/screenshots/square_plot.png?raw=true "Title")
 
