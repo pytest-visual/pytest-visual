@@ -3,6 +3,7 @@ from typing import List
 
 import cv2
 import numpy as np
+import pytest
 from PIL import Image
 from torch import Tensor
 
@@ -64,3 +65,19 @@ def visualize_dataset(visual: VisualFixture, dataset: ClockCoordinateDataset):
 def test_get_label():
     assert get_label(Path("examples/end_to_end/test_data/train/hash_00_00.png")) == Time(0, 0)
     assert get_label(Path("examples/end_to_end/test_data/train/hash_11_24.png")) == Time(11, 24)
+
+
+def test_back_and_forth_conversion():
+    for hour in range(12):
+        for minute in range(60):
+            t = Time(hour, minute)
+            coords = t.get_coords()
+            t_reconstructed = Time.from_coords(coords)
+            assert t == t_reconstructed
+
+
+def test_percent_from_xy():
+    assert Time.percent_from_xy(Tensor([0, -1])) == pytest.approx(0)
+    assert Time.percent_from_xy(Tensor([1, 0])) == pytest.approx(0.25)
+    assert Time.percent_from_xy(Tensor([0, 1])) == pytest.approx(0.5)
+    assert Time.percent_from_xy(Tensor([-1, 0])) == pytest.approx(0.75)

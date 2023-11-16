@@ -96,19 +96,23 @@ class Time:
         self.minute = minute
 
     @staticmethod
-    def from_coords(coords: Tensor) -> "Time":
-        hour_xy, minute_xy = coords.reshape(2, 2)
+    def from_coords(coords: Dict[str, Tensor]) -> "Time":
+        hour_xy, minute_xy = coords["hour"], coords["minute"]
 
         # Calculate minutes
-        minute_percent = math.atan2(minute_xy[0], minute_xy[1]) / (2 * math.pi)
+        minute_percent = Time.percent_from_xy(minute_xy)
         minute = round(60 * minute_percent) % 60
 
         # Calculate hours, taking into account that the hour hand moves as the minute hand moves
-        hour_percent = math.atan2(hour_xy[0], hour_xy[1]) / (2 * math.pi)
+        hour_percent = Time.percent_from_xy(hour_xy)
         hour_percent -= minute_percent / 12
         hour = round(12 * hour_percent) % 12
 
         return Time(hour, minute)
+
+    @staticmethod
+    def percent_from_xy(xy: Tensor) -> float:
+        return (math.atan2(-xy[0], xy[1]) + math.pi) / (2 * math.pi)
 
     def get_coords(self) -> Dict[str, Tensor]:
         # Return a tensor of shape (4,) with the coordinates of the hour and minute hands.
