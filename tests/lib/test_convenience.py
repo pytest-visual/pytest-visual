@@ -1,6 +1,7 @@
 import numpy as np
 
 from visual.lib.convenience import (
+    ceil_division,
     correct_layout,
     get_grid_shape,
     get_image_max_value_from_type,
@@ -9,13 +10,21 @@ from visual.lib.convenience import (
 
 
 def test_get_grid_shape():
-    assert get_grid_shape((2, 3), 100) == (2, 3)
+    assert get_grid_shape(1, 3) == (1, 1)
+    assert get_grid_shape(2, 3) == (1, 2)
+    assert get_grid_shape(3, 3) == (1, 3)
+    assert get_grid_shape(4, 3) == (2, 2)
+    assert get_grid_shape(5, 3) == (2, 3)
+    assert get_grid_shape(6, 3) == (2, 3)
+    assert get_grid_shape(7, 3) == (3, 3)
 
-    assert get_grid_shape(None, 1) == (1, 1)
-    assert get_grid_shape(None, 2) == (1, 2)
-    assert get_grid_shape(None, 3) == (2, 2)
-    assert get_grid_shape(None, 4) == (2, 2)
-    assert get_grid_shape(None, 5) == (2, 3)
+    assert get_grid_shape(10, 3) == (4, 3)
+
+
+def test_ceil_division():
+    assert ceil_division(19, 10) == 2
+    assert ceil_division(20, 10) == 2
+    assert ceil_division(21, 10) == 3
 
 
 def test_get_layout_from_image():

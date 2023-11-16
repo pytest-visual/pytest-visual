@@ -1,5 +1,5 @@
 import random
-from typing import Generator, List, Optional, Tuple
+from typing import Generator, List, Optional
 
 import numpy as np
 import pytest
@@ -55,13 +55,13 @@ class VisualFixture:
     def show_images(
         self,
         images: List[np.ndarray],
-        grid_shape: Optional[Tuple[int, int]] = None,
+        max_cols: int = 3,
         layout: Optional[str] = None,
         mean_denorm: Optional[List[float]] = None,
         std_denorm: Optional[List[float]] = None,
         min_value: float = 0,
         max_value: Optional[float] = None,
-        height: int = 400,
+        height_per_row: int = 200,
     ) -> None:
         """
         Convenience method to show a grid of images. Accepts only numpy arrays, but supports a
@@ -69,8 +69,7 @@ class VisualFixture:
 
         Parameters:
         - images (List[np.ndarray]): A list of images to show.
-        - grid_shape (Optional[Tuple[int, int]]): The grid shape to use. If not specified, the grid
-            shape is determined automatically.
+        - max_cols (int): Maximum number of columns in the grid.
         - layout (Optional[str]): The shape of the images. If not specified, the shape is
             determined automatically. Supported shapes are "hwc", "chw", "hw", "1chw", "1hwc".
         - mean_comp (Optional[List[float]]): The mean that was used to normalize the images, which
@@ -81,14 +80,17 @@ class VisualFixture:
         - min_value (float): The assumed minimum value of the images.
         - max_value (Optional[float]): The assumed maximum value of the images. If not specified,
             the maximum value is 1 for float images and 255 for integer images.
+        - height_per_row (int): The height of each row in the grid.
         """
         assert all(isinstance(image, np.ndarray) for image in images), "Images must be numpy arrays"
         assert len(images) > 0, "At least one image must be specified"
 
-        grid_shape = get_grid_shape(grid_shape, len(images))
+        grid_shape = get_grid_shape(len(images), max_cols)
         layout = get_layout_from_image(layout, images[0])
         max_value = get_image_max_value_from_type(max_value, images[0])
-        fig = create_plot_from_images(images, grid_shape, layout, mean_denorm, std_denorm, min_value, max_value, height)
+        fig = create_plot_from_images(
+            images, grid_shape, layout, mean_denorm, std_denorm, min_value, max_value, height_per_row * grid_shape[0]
+        )
         self.show(fig)
 
 

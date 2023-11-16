@@ -1,4 +1,3 @@
-import math
 from typing import List, Optional, Tuple
 
 import numpy as np
@@ -7,18 +6,17 @@ from plotly.graph_objs import Figure
 from plotly.subplots import make_subplots
 
 
-def get_grid_shape(grid_shape: Optional[Tuple[int, int]], num_images: int) -> Tuple[int, int]:
+def get_grid_shape(num_images: int, max_cols: int) -> Tuple[int, int]:
     """
-    Get or calculate the shape of the grid of images to show.
+    Calculate the shape of the grid of images to show.
     """
-    if grid_shape is not None:
-        return grid_shape
-
-    # Try to find a square grid, with the number of rows and columns as close as possible.
-    # Prefer more rows than columns.
-    cols = math.ceil(num_images**0.5 - 1e-6)
-    rows = math.ceil(num_images / cols)
+    rows = ceil_division(num_images, max_cols)
+    cols = ceil_division(num_images, rows)
     return rows, cols
+
+
+def ceil_division(n, d):
+    return (n + d - 1) // d
 
 
 def get_layout_from_image(layout: Optional[str], image: np.ndarray) -> str:
