@@ -20,22 +20,23 @@ from visual.interface import VisualFixture, fix_seeds, standardize, visual
 test_data_path = Path("examples/end_to_end/test_data")
 
 
-def test_ClockDataset(visual: VisualFixture, fix_seeds):
+def test_original_labels(visual: VisualFixture, fix_seeds):
     dataset = ClockDataset(test_data_path / "train")
     images, labels = [], []
     for image, label in dataset:
         images.append(standardize(image.numpy(), mean_denorm=mean_norm, std_denorm=std_norm))
         labels.append(str(label))
 
-    visual.print("Non-augmented dataset with time labels:")
+    visual.print("Dataset with time labels:")
     visual.show_images(images, labels)
 
 
-def test_ClockCoordinateDataset(visual: VisualFixture, fix_seeds):
+def test_with_hands(visual: VisualFixture, fix_seeds):
     dataset_non_aug = ClockCoordinateDataset(test_data_path / "train")
-    visual.print("Non-augmented dataset with hands drawn:")
+    visual.print("Dataset with hands drawn:")
     visualize_dataset(visual, dataset_non_aug)
 
+def test_augmented_with_hands(visual: VisualFixture, fix_seeds):
     dataset_aug = ClockCoordinateDataset(test_data_path / "train", augment=True)
     visual.print("Augmented dataset with hands drawn:")
     visualize_dataset(visual, dataset_aug)
