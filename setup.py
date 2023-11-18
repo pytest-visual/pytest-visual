@@ -13,6 +13,7 @@ def get_requirements() -> List[str]:
         "numpy>=1.17.0",
         "pandas>=2.0.0",
         "graphviz>=0.17",
+        "Pillow>=8.0.0",
     ]
 
 
