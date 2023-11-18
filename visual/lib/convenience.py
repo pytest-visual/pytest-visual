@@ -114,6 +114,7 @@ def create_plot_from_images(
 
     # Set height
     figure.update_layout(height=height)
+
     return figure
 
 

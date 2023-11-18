@@ -1,9 +1,12 @@
+import os
 import random
+import tempfile
 from typing import Generator, List, Optional
 
 import numpy as np
 import pytest
 from _pytest.fixtures import FixtureRequest
+from PIL import Image
 from plotly.graph_objs import Figure
 
 from visual.lib.convenience import (
@@ -58,7 +61,7 @@ class VisualFixture:
         images: List[np.ndarray],
         labels: Optional[List[str]] = None,
         max_cols: int = 3,
-        height_per_row: Optional[int] = 300,
+        height_per_row: float = 300,
     ) -> None:
         """
         Convenience method to show a grid of images. Only accepts standardized numpy images.
@@ -67,7 +70,7 @@ class VisualFixture:
         - images (List[np.ndarray]): A list of images to show.
         - labels (Optional[List[str]]): A list of labels for each image.
         - max_cols (int): Maximum number of columns in the grid.
-        - height_per_row (Optional[int]): The height of each row in the grid, or assign height automatically.
+        - height_per_row (float): The height of each row in the grid.
         """
         assert all(isinstance(image, np.ndarray) for image in images), "Images must be numpy arrays"
         assert len(images) > 0, "At least one image must be specified"
@@ -81,7 +84,7 @@ class VisualFixture:
         self,
         image: np.ndarray,
         label: Optional[str] = None,
-        height: Optional[int] = None,
+        height: float = 600,
     ) -> None:
         """
         Convenience method to show a single image. Only accepts standardized numpy images.
@@ -89,10 +92,43 @@ class VisualFixture:
         Parameters:
         - image (np.ndarray): The image to show.
         - label (Optional[str]): A label for the image.
-        - height (Optional[int]): The height of the image, or assign height automatically.
+        - height (float): The height of the image.
         """
         labels = None if label is None else [label]
         self.show_images([image], labels, max_cols=1, height_per_row=height)
+
+    def show_model(
+        self,
+        model,
+        input_size,
+        depth: int = 100,
+        height: float = 1500,
+    ) -> None:
+        """
+        Convenience method to show a PyTorch model. Requires the torchview package.
+
+        Parameters:
+        - model (torch.nn.Module): The model to show.
+        - input_size (Tuple[int, ...]): The input size of the model.
+        - depth (int): The maximum depth of the model to show.
+        - height (float): The height of the image.
+        """
+        import torchview  # isort: skip
+
+        plot = torchview.draw_graph(model, input_size=input_size, depth=depth)
+
+        # Create temporary file path
+        tempfile_path = tempfile.mktemp()
+        plot.visual_graph.render(tempfile_path, format="png")
+
+        # Read image and show
+        image = np.array(Image.open(tempfile_path + ".png"))
+        self.show_image(image, height=height)
+
+        # Remove temporary file
+        os.remove(tempfile_path)
+        os.remove(tempfile_path + ".png")
+
 
 @pytest.fixture
 def visual(request: FixtureRequest, visual_UI: UI) -> Generator[VisualFixture, None, None]:

@@ -4,3 +4,4 @@ pre-commit>=3.0.0
 torchvision>=0.16
 torch>=2.0.0
 opencv-python>=4.0.0
+torchview>=0.2.6

@@ -10,7 +10,7 @@ import torchvision.transforms.v2.functional as F
 from PIL import Image
 from torch import Tensor
 from torch.utils.data import DataLoader, Dataset
-from torchvision.models import resnet18
+from torchvision.models import ResNet18_Weights, resnet18
 
 data_dir = Path("data")
 models_dir = Path("models")
@@ -28,7 +28,7 @@ def main() -> None:
 
     # Initialize model
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model = get_model().to(device)
+    model = get_model(pretrained=True).to(device)
 
     # Train and test
     train(model, train_loader, val_loader, device)
@@ -189,8 +189,11 @@ def augment(image: Tensor, label: Dict[str, Tensor]) -> Tuple[Tensor, Dict[str, 
 # Model
 
 
-def get_model(pretrained: bool = True) -> nn.Module:
-    model = resnet18(pretrained=pretrained)
+def get_model(pretrained: bool) -> nn.Module:
+    if pretrained:
+        model = resnet18(weights=ResNet18_Weights.IMAGENET1K_V1)
+    else:
+        model = resnet18()
     model.fc = get_model_head(model.fc.in_features)
     return model
 

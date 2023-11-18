@@ -59,6 +59,12 @@ In order to run examples in this repository, you also need development dependenc
 pip install -r requirements-dev.txt
 ```
 
+For Pytorch model visualization, you'll need to install the graphviz package through your system package management, as described [here](https://graphviz.org/download/). You also have to install torchview (it isn't included by default, as this also installs the rather heavyweight Pytorch, and some people may not need it):
+
+```bash
+pip install torchview --upgrade
+```
+
 Then go to the root directory of this repository and run visualizations with
 
 ```bash

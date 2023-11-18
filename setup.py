@@ -12,6 +12,7 @@ def get_requirements() -> List[str]:
         "dash-bootstrap-components>=1.0.0",
         "numpy>=1.17.0",
         "pandas>=2.0.0",
+        "graphviz>=0.17",
     ]
 
 

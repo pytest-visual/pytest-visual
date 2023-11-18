@@ -4,6 +4,7 @@ from typing import List
 import cv2
 import numpy as np
 import pytest
+import torchview
 from PIL import Image
 from torch import Tensor
 
@@ -12,6 +13,8 @@ from examples.end_to_end.main import (
     ClockDataset,
     Time,
     get_label,
+    get_model,
+    get_model_head,
     mean_norm,
     std_norm,
 )
@@ -68,6 +71,12 @@ def visualize_dataset(visual: VisualFixture, dataset: ClockCoordinateDataset):
 
     # Show images
     visual.show_images(images)
+
+
+def test_model(visual: VisualFixture):
+    model = get_model(pretrained=False)
+    visual.print("Model high level structure: check that model head is in the correct position.")
+    visual.show_model(model, input_size=(1, 3, 224, 224), depth=1, height=2000)
 
 
 def test_get_label():
