@@ -58,7 +58,7 @@ class VisualFixture:
         images: List[np.ndarray],
         labels: Optional[List[str]] = None,
         max_cols: int = 3,
-        height_per_row: int = 300,
+        height_per_row: Optional[int] = 300,
     ) -> None:
         """
         Convenience method to show a grid of images. Only accepts standardized numpy images.
@@ -67,15 +67,32 @@ class VisualFixture:
         - images (List[np.ndarray]): A list of images to show.
         - labels (Optional[List[str]]): A list of labels for each image.
         - max_cols (int): Maximum number of columns in the grid.
-        - height_per_row (int): The height of each row in the grid.
+        - height_per_row (Optional[int]): The height of each row in the grid, or assign height automatically.
         """
         assert all(isinstance(image, np.ndarray) for image in images), "Images must be numpy arrays"
         assert len(images) > 0, "At least one image must be specified"
 
         grid_shape = get_grid_shape(len(images), max_cols)
-        figure = create_plot_from_images(images, labels, grid_shape, height_per_row * grid_shape[0])
+        total_height = None if height_per_row is None else height_per_row * grid_shape[0]
+        figure = create_plot_from_images(images, labels, grid_shape, total_height)
         self.show_figure(figure)
 
+    def show_image(
+        self,
+        image: np.ndarray,
+        label: Optional[str] = None,
+        height: Optional[int] = None,
+    ) -> None:
+        """
+        Convenience method to show a single image. Only accepts standardized numpy images.
+
+        Parameters:
+        - image (np.ndarray): The image to show.
+        - label (Optional[str]): A label for the image.
+        - height (Optional[int]): The height of the image, or assign height automatically.
+        """
+        labels = None if label is None else [label]
+        self.show_images([image], labels, max_cols=1, height_per_row=height)
 
 @pytest.fixture
 def visual(request: FixtureRequest, visual_UI: UI) -> Generator[VisualFixture, None, None]:

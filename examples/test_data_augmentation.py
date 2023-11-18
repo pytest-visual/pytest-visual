@@ -23,7 +23,7 @@ def augment(image: torch.Tensor) -> torch.Tensor:
 
 
 def test_show_augmentations(visual: VisualFixture, fix_seeds: None):
-    base_image = torchvision.io.read_image("examples/assets/english_springer.jpg")
+    base_image = torchvision.io.read_image("examples/assets/doge.jpg")
     augmented = [standardize(augment(base_image).numpy()) for _ in range(6)]
     labels = [f"Doge {i}" for i in range(1, 7)]
 
