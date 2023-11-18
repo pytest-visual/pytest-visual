@@ -27,7 +27,7 @@ def get_storage_path(request: FixtureRequest) -> Path:
     return root_path / ".pytest-visual" / relative_path / function_name
 
 
-def read_statements(storage_path: Path) -> Optional[List[Statement]]:
+def load_statements(storage_path: Path) -> Optional[List[Statement]]:
     statements_path = storage_path / _statements_file
     if statements_path.exists():
         with statements_path.open("r") as f:
@@ -36,7 +36,12 @@ def read_statements(storage_path: Path) -> Optional[List[Statement]]:
         return None
 
 
-def write_statements(storage_path: Path, statements: List[Statement]) -> None:
+def store_statements(storage_path: Path, statements: List[Statement]) -> None:
+    """
+    Stores the statements in the given path as a JSON file.
+    The statements are stored in a list of [name, statement_str] pairs,
+    where name is the name of the statement type and statement_str is the string representation of the statement.
+    """
     os.makedirs(storage_path, exist_ok=True)
     with (storage_path / _statements_file).open("w") as f:
         json.dump(statements, f, indent=4)

@@ -8,7 +8,7 @@ def test_show_square(visual: VisualFixture):
     fig = px.scatter(x=x, y=y)
 
     visual.print("Square plot")
-    visual.show(fig)
+    visual.show_figure(fig)
 
 
 def test_show_square_root(visual: VisualFixture):
@@ -16,4 +16,4 @@ def test_show_square_root(visual: VisualFixture):
     fig = px.scatter(x=x, y=y)
 
     visual.print("Square root plot")
-    visual.show(fig)
+    visual.show_figure(fig)

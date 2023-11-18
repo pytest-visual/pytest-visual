@@ -74,7 +74,7 @@ def create_plot_from_images(
     rows, cols = grid_shape
 
     # Create multiple augmented images and add them to a grid
-    fig = make_subplots(rows=rows, cols=cols, horizontal_spacing=0.05, vertical_spacing=0.05)
+    figure = make_subplots(rows=rows, cols=cols, horizontal_spacing=0.05, vertical_spacing=0.05)
     for r in range(rows):
         for c in range(cols):
             i = r * cols + c
@@ -83,13 +83,13 @@ def create_plot_from_images(
 
                 # Add image to grid
                 subfig = px.imshow(image, binary_string=True)
-                fig.update_layout(margin=dict(l=0, r=0, b=0, t=0))
-                fig.add_trace(subfig.data[0], row=r + 1, col=c + 1)
+                figure.update_layout(margin=dict(l=0, r=0, b=0, t=0))
+                figure.add_trace(subfig.data[0], row=r + 1, col=c + 1)
 
                 # Add label to image
                 if labels is not None:
                     # Add white background to text
-                    fig.add_annotation(
+                    figure.add_annotation(
                         xref="paper",
                         yref="paper",
                         x=0.5 * image.shape[1],
@@ -109,12 +109,12 @@ def create_plot_from_images(
             i = r * cols + c
 
             if i < len(images):
-                fig.update_xaxes(title_text="", showticklabels=False, showgrid=False, row=r + 1, col=c + 1)
-                fig.update_yaxes(title_text="", showticklabels=False, showgrid=False, row=r + 1, col=c + 1)
+                figure.update_xaxes(title_text="", showticklabels=False, showgrid=False, row=r + 1, col=c + 1)
+                figure.update_yaxes(title_text="", showticklabels=False, showgrid=False, row=r + 1, col=c + 1)
 
     # Set height
-    fig.update_layout(height=height)
-    return fig
+    figure.update_layout(height=height)
+    return figure
 
 
 def correct_layout(image: np.ndarray, layout: str) -> np.ndarray:

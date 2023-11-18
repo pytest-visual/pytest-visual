@@ -5,8 +5,8 @@ import pytest
 from visual.lib.storage import (
     clear_statements,
     get_storage_path,
-    read_statements,
-    write_statements,
+    load_statements,
+    store_statements,
 )
 
 
@@ -20,8 +20,8 @@ def test_storage(get_storage_path_fixture: Path):
     assert storage_path == Path(".pytest-visual/tests/test_io.py/test_storage").absolute()
 
     statements = [["print", "Hello world"]]
-    write_statements(storage_path, statements)
-    assert read_statements(storage_path) == statements
+    store_statements(storage_path, statements)
+    assert load_statements(storage_path) == statements
 
     clear_statements(storage_path)
-    assert read_statements(storage_path) is None
+    assert load_statements(storage_path) is None

@@ -18,8 +18,8 @@ from visual.lib.storage import (
     Statement,
     clear_statements,
     get_storage_path,
-    read_statements,
-    write_statements,
+    load_statements,
+    store_statements,
 )
 from visual.lib.ui import UI, Location, visual_UI
 
@@ -42,14 +42,14 @@ class VisualFixture:
         """
         self.statements.append(["print", text])
 
-    def show(self, fig: Figure) -> None:
+    def show_figure(self, figure: Figure) -> None:
         """
         Show a plotly figure within a visualization case.
 
         Parameters:
         - fig (Figure): The figure to show.
         """
-        self.statements.append(["show", str(fig.to_json())])
+        self.statements.append(["show", str(figure.to_json())])
 
     # Convenience interface
 
@@ -73,8 +73,8 @@ class VisualFixture:
         assert len(images) > 0, "At least one image must be specified"
 
         grid_shape = get_grid_shape(len(images), max_cols)
-        fig = create_plot_from_images(images, labels, grid_shape, height_per_row * grid_shape[0])
-        self.show(fig)
+        figure = create_plot_from_images(images, labels, grid_shape, height_per_row * grid_shape[0])
+        self.show_figure(figure)
 
 
 @pytest.fixture
@@ -106,7 +106,7 @@ def visual(request: FixtureRequest, visual_UI: UI) -> Generator[VisualFixture, N
         if not yes_all:
             # Read previous statements
             location = Location(request.node.module.__file__, request.node.name)  # type: ignore
-            prev_statements = read_statements(storage_path)
+            prev_statements = load_statements(storage_path)
 
             # Check if statements have changed, and prompt user if so
             if statements != prev_statements:
@@ -114,7 +114,7 @@ def visual(request: FixtureRequest, visual_UI: UI) -> Generator[VisualFixture, N
                     pytest.fail("Visualizations were not accepted")
 
         # No declined changes or --visual-yes-all flag set, so accept changes
-        write_statements(storage_path, statements)
+        store_statements(storage_path, statements)
     elif reset_all:
         # Reset visualization
         clear_statements(storage_path)
