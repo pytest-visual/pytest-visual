@@ -24,9 +24,13 @@ def test_original_labels(visual: VisualFixture, fix_seeds):
     dataset = ClockDataset(test_data_path / "train")
     images, labels = [], []
     for image, label in dataset:
+        # Convert to numpy, denormalize, and standardize layout to HWC
         images.append(standardize(image.numpy(), mean_denorm=mean_norm, std_denorm=std_norm))
+
+        # Convert label to string
         labels.append(str(label))
 
+    # Show images
     visual.print("Dataset with time labels:")
     visual.show_images(images, labels)
 
@@ -46,6 +50,7 @@ def test_augmented_with_hands(visual: VisualFixture, fix_seeds):
 def visualize_dataset(visual: VisualFixture, dataset: ClockCoordinateDataset):
     images: List[np.ndarray] = []
     for image, label in dataset:
+        # Convert to numpy, denormalize, and standardize layout to HWC
         image = standardize(image.numpy(), mean_denorm=mean_norm, std_denorm=std_norm)
 
         # Draw clock hands as lines
@@ -61,6 +66,7 @@ def visualize_dataset(visual: VisualFixture, dataset: ClockCoordinateDataset):
 
         images.append(image)
 
+    # Show images
     visual.show_images(images)
 
 
