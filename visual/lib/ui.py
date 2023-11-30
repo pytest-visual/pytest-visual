@@ -228,7 +228,7 @@ class UI:
 
         rendered_statements: list = []
         if statements is None:
-            rendered_statements.append(html.P("No statements to display"))
+            rendered_statements.append(html.P("Nothing to show"))
         else:
             for cmd, contents in statements:
                 if cmd == "print":

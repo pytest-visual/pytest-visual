@@ -22,10 +22,19 @@ def augment(image: torch.Tensor) -> torch.Tensor:
     return image
 
 
-def test_show_augmentations(visual: VisualFixture, fix_seeds: None):
-    base_image = torchvision.io.read_image("examples/assets/doge.jpg")
-    augmented = [standardize(augment(base_image).numpy()) for _ in range(6)]
-    labels = [f"Doge {i}" for i in range(1, 7)]
+# fmt: off
 
-    visual.print("Augmented images")
-    visual.show_images(augmented, labels=labels)
+# `visual` fixture indicates that the test results must be manually verified
+# `fix_seeds` fixture ensures deterministic results
+def test_show_augmentations(visual, fix_seeds):
+    # Create augmented images
+    base_image = torchvision.io.read_image("examples/assets/doge.jpg")  # Load the base image
+    augmented = [augment(base_image) for _ in range(6)]  # Your augmentation function
+    augmented = [image.numpy() for image in augmented]  # pytest-visual accepts only numpy images
+    augmented = [standardize(image) for image in augmented]  # Standardize image to uint8 with [0, 255] range and HWC format
+
+    # Show helpful text with images
+    visual.print("Doggos augmented")
+    visual.show_images(augmented)
+
+# fmt: on

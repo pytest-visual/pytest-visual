@@ -18,32 +18,31 @@ For example, we can easily test whether an image data augmentation pipeline prod
 
 ## Example
 
-In this example, we demonstrate how to create a basic visual test case. We first create a Python file with a prefix `test_*` (eg. `test_visualization.py`), and add this function:
+In this example, we demonstrate how to create a basic visual test case. We first create a Python file with a prefix `test_*` (eg. `test_data_augmentation.py`), and add this function:
 
 ```python
-# `pytest-visual` accepts `plotly` figures
-import plotly.express as px
+# `visual` fixture indicates that the test results must be manually verified
+# `fix_seeds` fixture ensures deterministic results
+def test_show_augmentations(visual, fix_seeds):
+    # Create augmented images
+    base_image = torchvision.io.read_image("examples/assets/doge.jpg")  # Load the base image
+    augmented = [augment(base_image) for _ in range(6)]  # Your augmentation function
+    augmented = [image.numpy() for image in augmented]  # pytest-visual accepts only numpy images
+    augmented = [standardize(image) for image in augmented]  # Standardize image to uint8 with [0, 255] range and HWC format
 
-# `test_` prefix makes this a pytest test
-# `visual` argument makes this a visual test
-def test_show_square(visual):
-    # Plot the test data
-    x, y = [0, 1, 2, 3, 4, 5], [0, 1, 4, 9, 16, 25]
-    fig = px.scatter(x=x, y=y)
-
-    # You can have multiple print() and show() calls in a single case.
-    visualize.print("Square plot")
-    visualize.show(fig)
+    # Show helpful text with images
+    visual.print("Doggos augmented")
+    visual.show_images(augmented)
 ```
 
 Then run `pytest --visualize`, and open the url displayed in the terminal window (most likely `http://127.0.0.1:54545`). If the visualization looks OK, click "Accept", and pytest should complete with success.
 
-![A before and after plot displayed side by side.](examples/screenshots/square_plot.png?raw=true "Title")
-
-Here's a sample output from `examples/test_data_augmentation.py`:
+You should see the following output:
 ![A before and after image showing the effect of data augmentation on a picture of a dog.](examples/screenshots/data_augmentation.jpg?raw=true)
 
-See [Installation](#installation) for instructions on how to run these examples.
+Note that the left side is empty as this is the first time accepting this test case.
+
+The full code together with the provided `augment()` function is available at `examples/test_data_augmentation.py`. See [Installation](#installation) for instructions on how to run these examples.
 
 ## Installation
 
