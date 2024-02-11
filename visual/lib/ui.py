@@ -209,7 +209,7 @@ class UI:
     def _render_statements_in_div(self, statements: Optional[List[Statement]], div_id: str) -> dbc.CardBody:
         """
         Renders statements into a specified division in the UI.
-        Each statement could either be a print statement or a graphical (plotly) figure.
+        Each statement could either be a text statement, plotly figure, or images.
         """
 
         code_style = {
@@ -231,9 +231,9 @@ class UI:
             rendered_statements.append(html.P("Nothing to show"))
         else:
             for cmd, contents in statements:
-                if cmd == "print":
+                if cmd == "text":
                     rendered_statements.append(html.Code(contents, style=code_style))
-                elif cmd == "show":
+                elif cmd == "figure":
                     figure = plotly.io.from_json(contents)
                     rendered_statements.append(dbc.Card(dcc.Graph(figure=figure), style=plot_style))
                 else:

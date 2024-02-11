@@ -36,27 +36,25 @@ class VisualFixture:
 
     # Core interface
 
-    def print(self, text: str) -> None:
+    def text(self, text: str) -> None:
         """
         Show text within a visualization case.
 
         Parameters:
         - text (str): The text to show.
         """
-        self.statements.append(["print", text])
+        self.statements.append(["text", text])
 
-    def show_figure(self, figure: Figure) -> None:
+    def figure(self, figure: Figure) -> None:
         """
         Show a plotly figure within a visualization case.
 
         Parameters:
         - fig (Figure): The figure to show.
         """
-        self.statements.append(["show", str(figure.to_json())])
+        self.statements.append(["figure", str(figure.to_json())])
 
-    # Convenience interface
-
-    def show_images(
+    def images(
         self,
         images: List[np.ndarray],
         labels: Optional[List[str]] = None,
@@ -78,9 +76,11 @@ class VisualFixture:
         grid_shape = get_grid_shape(len(images), max_cols)
         total_height = None if height_per_row is None else height_per_row * grid_shape[0]
         figure = create_plot_from_images(images, labels, grid_shape, total_height)
-        self.show_figure(figure)
+        self.figure(figure)
 
-    def show_image(
+    # Convenience interface
+
+    def image(
         self,
         image: np.ndarray,
         label: Optional[str] = None,
@@ -95,9 +95,9 @@ class VisualFixture:
         - height (float): The height of the image.
         """
         labels = None if label is None else [label]
-        self.show_images([image], labels, max_cols=1, height_per_row=height)
+        self.images([image], labels, max_cols=1, height_per_row=height)
 
-    def show_model(
+    def model(
         self,
         model,
         input_size,
@@ -123,7 +123,7 @@ class VisualFixture:
 
         # Read image and show
         image = np.array(Image.open(tempfile_path + ".png"))
-        self.show_image(image, height=height)
+        self.image(image, height=height)
 
         # Remove temporary file
         os.remove(tempfile_path)

@@ -6,7 +6,7 @@ from typing import List, Optional
 
 from _pytest.fixtures import FixtureRequest
 
-Statement = List[str]  # ["print" | "show", item]
+Statement = List[str]  # Essentially a tuple: ["text" | "figure" | "images", item]
 
 
 def get_storage_path(request: FixtureRequest) -> Path:

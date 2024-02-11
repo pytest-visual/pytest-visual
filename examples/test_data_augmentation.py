@@ -26,7 +26,7 @@ def augment(image: torch.Tensor) -> torch.Tensor:
 
 # `visual` fixture indicates that the test results must be manually verified
 # `fix_seeds` fixture ensures deterministic results
-def test_show_augmentations(visual, fix_seeds):
+def test_show_augmentations(visual: VisualFixture, fix_seeds):
     # Create augmented images
     base_image = torchvision.io.read_image("examples/assets/doge.jpg")  # Load the base image
     augmented = [augment(base_image) for _ in range(6)]  # Your augmentation function
@@ -34,7 +34,7 @@ def test_show_augmentations(visual, fix_seeds):
     augmented = [standardize(image) for image in augmented]  # Standardize image to uint8 with [0, 255] range and HWC format
 
     # Show helpful text with images
-    visual.print("Doggos augmented")
-    visual.show_images(augmented)
+    visual.text("Doggos augmented")
+    visual.images(augmented)
 
 # fmt: on

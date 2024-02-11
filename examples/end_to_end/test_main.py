@@ -35,19 +35,19 @@ def test_original_labels(visual: VisualFixture, fix_seeds):
         labels.append(str(label))
 
     # Show images
-    visual.print("Dataset with time labels:")
-    visual.show_images(images, labels)
+    visual.text("Dataset with time labels:")
+    visual.images(images, labels)
 
 
 def test_with_hands(visual: VisualFixture, fix_seeds):
     dataset_non_aug = ClockCoordinateDataset(test_data_path / "train")
-    visual.print("Dataset with hands drawn:")
+    visual.text("Dataset with hands drawn:")
     visualize_dataset(visual, dataset_non_aug)
 
 
 def test_augmented_with_hands(visual: VisualFixture, fix_seeds):
     dataset_aug = ClockCoordinateDataset(test_data_path / "train", augment=True)
-    visual.print("Augmented dataset with hands drawn:")
+    visual.text("Augmented dataset with hands drawn:")
     visualize_dataset(visual, dataset_aug)
 
 
@@ -71,13 +71,13 @@ def visualize_dataset(visual: VisualFixture, dataset: ClockCoordinateDataset):
         images.append(image)
 
     # Show images
-    visual.show_images(images)
+    visual.images(images)
 
 
 def test_model(visual: VisualFixture):
     model = get_model(pretrained=False)
-    visual.print("Model high level structure: check that model head is in the correct position.")
-    visual.show_model(model, input_size=(1, 3, 224, 224), depth=1, height=2000)
+    visual.text("Model high level structure: check that model head is in the correct position.")
+    visual.model(model, input_size=(1, 3, 224, 224), depth=1, height=2000)
 
 
 def test_get_label():
