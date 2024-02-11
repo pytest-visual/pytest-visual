@@ -12,6 +12,7 @@ from examples.end_to_end.main import (
     ClockCoordinateDataset,
     ClockDataset,
     Time,
+    clock_collate_fn,
     get_label,
     get_model,
     get_model_head,
