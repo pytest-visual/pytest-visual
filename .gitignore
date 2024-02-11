@@ -9,3 +9,5 @@ Pipfile
 .python-version
 
 data/
+
+examples/end_to_end/models/

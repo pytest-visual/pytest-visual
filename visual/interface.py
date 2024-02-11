@@ -59,7 +59,7 @@ class VisualFixture:
         images: List[np.ndarray],
         labels: Optional[List[str]] = None,
         max_cols: int = 3,
-        height_per_row: float = 300,
+        image_size: float = 300,
     ) -> None:
         """
         Convenience method to show a grid of images. Only accepts standardized numpy images.
@@ -68,13 +68,14 @@ class VisualFixture:
         - images (List[np.ndarray]): A list of images to show.
         - labels (Optional[List[str]]): A list of labels for each image.
         - max_cols (int): Maximum number of columns in the grid.
-        - height_per_row (float): The height of each row in the grid.
+        - image_size (float): The larger side of each image in the grid, in pixels.
         """
         assert all(isinstance(image, np.ndarray) for image in images), "Images must be numpy arrays"
         assert len(images) > 0, "At least one image must be specified"
 
         grid_shape = get_grid_shape(len(images), max_cols)
-        total_height = None if height_per_row is None else height_per_row * grid_shape[0]
+        total_height = None if image_size is None else image_size * grid_shape[0]
+
         figure = create_plot_from_images(images, labels, grid_shape, total_height)
         self.figure(figure)
 
@@ -84,7 +85,7 @@ class VisualFixture:
         self,
         image: np.ndarray,
         label: Optional[str] = None,
-        height: float = 600,
+        image_size: float = 600,
     ) -> None:
         """
         Convenience method to show a single image. Only accepts standardized numpy images.
@@ -92,17 +93,17 @@ class VisualFixture:
         Parameters:
         - image (np.ndarray): The image to show.
         - label (Optional[str]): A label for the image.
-        - height (float): The height of the image.
+        - image_size (float): The height of the image.
         """
         labels = None if label is None else [label]
-        self.images([image], labels, max_cols=1, height_per_row=height)
+        self.images([image], labels, max_cols=1, image_size=image_size)
 
     def model(
         self,
         model,
         input_size,
         depth: int = 100,
-        height: float = 1500,
+        image_size: float = 1500,
     ) -> None:
         """
         Convenience method to show a PyTorch model. Requires the torchview package.
@@ -111,7 +112,7 @@ class VisualFixture:
         - model (torch.nn.Module): The model to show.
         - input_size (Tuple[int, ...]): The input size of the model.
         - depth (int): The maximum depth of the model to show.
-        - height (float): The height of the image.
+        - image_size (float): The height of the image.
         """
         import torchview  # isort: skip
 
@@ -123,7 +124,7 @@ class VisualFixture:
 
         # Read image and show
         image = np.array(Image.open(tempfile_path + ".png"))
-        self.image(image, height=height)
+        self.image(image, image_size=image_size)
 
         # Remove temporary file
         os.remove(tempfile_path)
