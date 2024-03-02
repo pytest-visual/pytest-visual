@@ -31,8 +31,8 @@ def test_show_augmentations(visual, fix_seeds):
     augmented = [standardize(image) for image in augmented]  # Standardize image to uint8 with [0, 255] range and HWC format
 
     # Show helpful text with images
-    visual.print("Doggos augmented")
-    visual.show_images(augmented)
+    visual.text("Doggos augmented")
+    visual.images(augmented)
 ```
 
 Then run `pytest --visualize`, and open the url displayed in the terminal window (most likely `http://127.0.0.1:54545`). If the visualization looks OK, click "Accept", and pytest should complete with success.
