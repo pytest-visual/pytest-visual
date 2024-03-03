@@ -5,8 +5,8 @@ import plotly.express as px
 from plotly.graph_objs import Figure
 from plotly.subplots import make_subplots
 
-from visual.lib.models import MaterialStatement, ReferenceStatement
 from visual.lib.hasher import vector_hash_equal
+from visual.lib.models import MaterialStatement, ReferenceStatement
 
 
 def get_grid_shape(num_images: int, max_cols: int) -> Tuple[int, int]:
@@ -130,12 +130,14 @@ def correct_layout(image: np.ndarray, layout: str) -> np.ndarray:
         layout = layout[1:] + "c"
     return image
 
+
 # Statements
+
 
 def statement_lists_equal(prev_statements: List[MaterialStatement], statements: List[ReferenceStatement]) -> bool:
     if len(prev_statements) != len(statements):
         return False
-    
+
     for prev, now in zip(prev_statements, statements):
         if prev.Type != now.Type:
             return False
@@ -144,7 +146,9 @@ def statement_lists_equal(prev_statements: List[MaterialStatement], statements: 
         if (prev.HashVectors is None) != (now.HashVectors is None):
             return False
         if prev.HashVectors is not None and now.HashVectors is not None:
-            if not vector_hash_equal(np.asarray(prev.HashVectors.Vectors), np.asarray(now.HashVectors.Vectors), prev.HashVectors.ErrorThreshold):
+            if not vector_hash_equal(
+                np.asarray(prev.HashVectors.Vectors), np.asarray(now.HashVectors.Vectors), prev.HashVectors.ErrorThreshold
+            ):
                 return False
-    
+
     return True

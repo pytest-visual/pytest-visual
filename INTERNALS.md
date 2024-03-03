@@ -7,11 +7,12 @@ This document gives a high-level overview of how `pytest-visual` works.
 Specifically this document describes what happens when you run `pytest --visual`. What is being done when other flags are invoked is not described in this document.
 
 When a user runs `pytest --visual`, the following steps may occur:
-* Launch the UI
-* Run visual tests
-  * Compare currently available visualizations to previously stored visualizations
-  * If there's a difference, send visualizations to UI for accept/reject
-  * Store the new visualizations if accepted
+
+- Launch the UI
+- Run visual tests
+  - Compare currently available visualizations to previously stored visualizations
+  - If there's a difference, send visualizations to UI for accept/reject
+  - Store the new visualizations if accepted
 
 These steps mostly boil down to UI and persistence.
 
@@ -26,6 +27,7 @@ TBD.
 Data is stored to disk at `[project-root]/.pytest-visual/`. The directory structure at this location directly corresponds to the directory structure of tests in the project.
 
 Specifically, if the tests are located like this:
+
 ```
 ./tests/test_one.py
 ./tests/sub/test_two.py
@@ -33,6 +35,7 @@ Specifically, if the tests are located like this:
 ```
 
 Then the information for each test file will be stored at these directories, respectively:
+
 ```
 ./.pytest-visual/checkpoint/tests/test_one.py/
 ./.pytest-visual/checkpoint/tests/sub/test_two.py/
@@ -40,6 +43,7 @@ Then the information for each test file will be stored at these directories, res
 ```
 
 Each test case will have its own directory, named after the test case. For example, if `test_one.py` contain test cases `test_something()` and `test_something_else()`, then the visualizations for that test case will be stored at:
+
 ```
 ./.pytest-visual/checkpoint/tests/test_one.py/test_something/
 ./.pytest-visual/checkpoint/tests/test_one.py/test_something_else/
@@ -48,6 +52,7 @@ Each test case will have its own directory, named after the test case. For examp
 ### File structure
 
 Each test case directory contains at least one file, `checkpoint.json`. This file contains the statements run during the test case, in order of execution. If some of the stored statements reference files, those files will be stored in the same directory. The contents of `checkpoint.json` is the following:
+
 ```json
 {
   "statements": [
@@ -69,6 +74,7 @@ Each test case directory contains at least one file, `checkpoint.json`. This fil
 Assets are stored in the same directory as `checkpoint.json`, and are relative to the directory.
 
 Thus the files for a test case with two images and a plot would look like this:
+
 ```
 ./.pytest-visual/checkpoint/tests/test_one.py/test_something/checkpoint.json
 ./.pytest-visual/checkpoint/tests/test_one.py/test_something/assets/0/image_0.jpg

@@ -7,7 +7,7 @@ from visual.lib.hasher import (
     hash_text,
     vector_hash_array,
     vector_hash_equal,
-    vector_hash_threshold
+    vector_hash_threshold,
 )
 
 # Test FixedPattern

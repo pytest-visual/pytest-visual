@@ -1,17 +1,17 @@
-from typing import List
 from pathlib import Path
+from typing import List
 
+import numpy as np
 import pytest
 from plotly import graph_objs as go
-import numpy as np
 
+from visual.lib.models import HashVectors_, MaterialStatement, ReferenceStatement
 from visual.lib.storage import (
     get_storage_path,
     load_statement_references,
     materialize_assets,
     store_statements,
 )
-from visual.lib.models import MaterialStatement, ReferenceStatement, HashVectors_
 
 
 @pytest.fixture

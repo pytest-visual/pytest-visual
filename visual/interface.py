@@ -18,6 +18,8 @@ from visual.lib.convenience import (
     statement_lists_equal,
 )
 from visual.lib.flags import get_visualization_flags, pytest_addoption
+from visual.lib.hasher import hash_text, vector_hash_equal
+from visual.lib.models import MaterialStatement
 from visual.lib.storage import (
     clear_checkpoints,
     get_storage_path,
@@ -25,9 +27,7 @@ from visual.lib.storage import (
     materialize_assets,
     store_statements,
 )
-from visual.lib.models import MaterialStatement
 from visual.lib.ui import UI, Location, visual_UI
-from visual.lib.hasher import hash_text, vector_hash_equal
 
 
 class VisualFixture:

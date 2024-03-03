@@ -2,13 +2,13 @@ import numpy as np
 
 from visual.lib.convenience import (
     ceil_division,
-    statement_lists_equal,
     correct_layout,
     get_grid_shape,
     get_image_max_value_from_type,
     get_layout_from_image,
+    statement_lists_equal,
 )
-from visual.lib.models import MaterialStatement, ReferenceStatement, HashVectors_
+from visual.lib.models import HashVectors_, MaterialStatement, ReferenceStatement
 
 
 def test_get_grid_shape():
@@ -64,15 +64,17 @@ def test_correct_layout():
     assert correct_layout(image4d, "1hwc").shape == (2, 3, 4)
     assert correct_layout(image4d, "1chw").shape == (3, 4, 2)
 
+
 # Statements
+
 
 def test_statement_lists_equal():
     refs = [
         ReferenceStatement(Type="text", Hash="", Content=""),
         ReferenceStatement(Type="images", Hash=""),
         ReferenceStatement(Type="images", Hash="abc"),
-        ReferenceStatement(Type="images", Hash="abc", HashVectors=HashVectors_(Vectors=[[1., 2., 3.]], ErrorThreshold=0.1)),
-        ReferenceStatement(Type="images", Hash="abc", HashVectors=HashVectors_(Vectors=[[3., 4., 5.]], ErrorThreshold=0.1)),
+        ReferenceStatement(Type="images", Hash="abc", HashVectors=HashVectors_(Vectors=[[1.0, 2.0, 3.0]], ErrorThreshold=0.1)),
+        ReferenceStatement(Type="images", Hash="abc", HashVectors=HashVectors_(Vectors=[[3.0, 4.0, 5.0]], ErrorThreshold=0.1)),
     ]
     mats = [MaterialStatement(**ref.model_dump()) for ref in refs]
 

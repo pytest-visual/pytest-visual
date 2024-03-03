@@ -2,14 +2,15 @@ import json
 import os
 import shutil
 from pathlib import Path
-from typing import List, Optional, Any
+from typing import Any, List, Optional
 
-from _pytest.fixtures import FixtureRequest
-import plotly
-from PIL import Image
 import numpy as np
+import plotly
+from _pytest.fixtures import FixtureRequest
+from PIL import Image
 
 from visual.lib.models import MaterialStatement, ReferenceStatement
+
 
 def get_storage_path(request: FixtureRequest) -> Path:
     """
@@ -93,7 +94,7 @@ def store_statements(storage_dir: Path, materials: List[MaterialStatement]) -> N
         references.append(ref)
 
     os.makedirs(storage_dir, exist_ok=True)
-    #with (storage_dir / _checkpoint_file).open("w") as f:
+    # with (storage_dir / _checkpoint_file).open("w") as f:
     #    json.dump(materials, f, indent=4) # Doesn't work with pydantic models
 
     with (storage_dir / _checkpoint_file).open("w") as f:
