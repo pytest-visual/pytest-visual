@@ -94,11 +94,9 @@ def store_statements(storage_dir: Path, materials: List[MaterialStatement]) -> N
         references.append(ref)
 
     os.makedirs(storage_dir, exist_ok=True)
-    # with (storage_dir / _checkpoint_file).open("w") as f:
-    #    json.dump(materials, f, indent=4) # Doesn't work with pydantic models
 
     with (storage_dir / _checkpoint_file).open("w") as f:
-        json.dump({"statements": [r.model_dump() for r in references]}, f, indent=4)
+        json.dump({"statements": [r.model_dump() for r in references]}, f, indent=2)
 
 
 def clear_checkpoints(storage_path: Path) -> None:
