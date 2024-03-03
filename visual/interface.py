@@ -167,10 +167,14 @@ def visual(request: FixtureRequest, visual_UI: UI) -> Generator[VisualFixture, N
         if not yes_all:
             # Read previous statements
             location = Location(request.node.module.__file__, request.node.name)  # type: ignore
-            prev_statements = load_statement_references(storage_path)
+            prev_ref_statements = load_statement_references(storage_path)
 
             # Prompt user if statements have changed
-            if prev_statements is None or not statement_lists_equal(statements, prev_statements):
+            if prev_ref_statements is None or not statement_lists_equal(statements, prev_ref_statements):
+                if prev_ref_statements is not None:
+                    prev_statements = [materialize_assets(r, storage_path) for r in prev_ref_statements]
+                else:
+                    prev_statements = None
                 if not visual_UI.prompt_user(location, prev_statements, statements):
                     pytest.fail("Visualizations were not accepted")
 

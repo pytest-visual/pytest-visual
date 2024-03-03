@@ -228,14 +228,15 @@ class UI:
         if statements is None:
             rendered_statements.append(html.P("Nothing to show"))
         else:
-            for cmd, contents in statements:
-                if cmd == "text":
-                    rendered_statements.append(html.Code(contents, style=code_style))
-                elif cmd == "figure":
-                    figure = plotly.io.from_json(contents)
+            for statement in statements:
+                if statement.Type == "text":
+                    rendered_statements.append(html.Code(statement.Content, style=code_style))
+                elif statement.Type == "figure":
+                    assert len(statement.Assets) == 1, "A figure statement should have exactly one asset"
+                    figure = statement.Assets[0]
                     rendered_statements.append(dbc.Card(dcc.Graph(figure=figure), style=plot_style))
                 else:
-                    raise ValueError(f"Invalid command {cmd}")
+                    raise ValueError(f"Invalid command {statement.Type}")
 
         div = dbc.CardBody(rendered_statements, id=div_id)
         return div
