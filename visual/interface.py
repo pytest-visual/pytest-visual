@@ -11,7 +11,7 @@ from plotly.graph_objs import Figure
 
 from visual.lib.convenience import (
     correct_layout,
-    create_plot_from_images,
+    create_figure_from_images,
     get_grid_shape,
     get_image_max_value_from_type,
     get_layout_from_image,
@@ -83,7 +83,7 @@ class VisualFixture:
         grid_shape = get_grid_shape(len(images), max_cols)
         total_height = image_size * grid_shape[0]
 
-        figure = create_plot_from_images(images, labels, grid_shape, total_height)
+        figure = create_figure_from_images(images, labels, grid_shape, total_height)
         self.figure(figure)
 
     # Convenience interface

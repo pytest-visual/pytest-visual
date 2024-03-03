@@ -35,7 +35,7 @@ def test_store_load_statements(get_storage_path_fixture):
     # Store statements
     stored_mats: List[MaterialStatement] = []
     stored_mats.append(MaterialStatement(Type="text", Content="This is a test", Hash="123"))
-    stored_mats.append(MaterialStatement(Type="plot", Assets=[fig], Hash="456"))
+    stored_mats.append(MaterialStatement(Type="figure", Assets=[fig], Hash="456"))
     stored_mats.append(MaterialStatement(Type="images", Assets=[image, image], Hash="789", HashVectors=hash_vectors))
     store_statements(get_storage_path_fixture, stored_mats)
 

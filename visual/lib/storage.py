@@ -47,7 +47,7 @@ def materialize_assets(reference: ReferenceStatement, prefix_path: Path) -> Mate
     materialized_assets: List[Any] = []
     for asset in reference.Assets:
         full_path = prefix_path / asset
-        if reference.Type == "plot":
+        if reference.Type == "figure":
             materialized_assets.append(plotly.io.read_json(full_path))
         if reference.Type == "images":
             materialized_assets.append(np.array(Image.open(full_path)))
@@ -71,8 +71,8 @@ def store_statements(storage_dir: Path, materials: List[MaterialStatement]) -> N
     for statement_idx, material in enumerate(materials):
         asset_ref_list: List[str] = []
         for asset_idx, asset in enumerate(material.Assets):
-            if material.Type == "plot":
-                ref = Path("assets") / str(statement_idx) / f"plot_{asset_idx}.json"
+            if material.Type == "figure":
+                ref = Path("assets") / str(statement_idx) / f"figure_{asset_idx}.json"
                 os.makedirs((storage_dir / ref).parent, exist_ok=True)
                 plotly.io.write_json(asset, storage_dir / ref)
                 asset_ref_list.append(str(ref))

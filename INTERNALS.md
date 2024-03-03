@@ -57,10 +57,10 @@ Each test case directory contains at least one file, `checkpoint.json`. This fil
 {
   "statements": [
     {
-      "Type": "text" | "images" | "plot",
+      "Type": "text" | "images" | "figure",
       "Content": "Some text",  # Only for "text" type
-      "Assets": [] | ["assets/0/image_0.jpg", "assets/0/image_1.jpg"] | ["assets/0/plot_0.json"]
-      "Hash": "hash of the content"  # Hash of the content, plot or image metadata
+      "Assets": [] | ["assets/0/image_0.jpg", "assets/0/image_1.jpg"] | ["assets/0/figure_0.json"]
+      "Hash": "hash of the content"  # Hash of the content, figure or image metadata
       "HashVectors": {
         "Vector": array of shape (n_images, hash_vector_size)  # For approximate comparison of "images"
         "ErrorThreshold": float  # For approximate comparison of "images"
@@ -73,13 +73,13 @@ Each test case directory contains at least one file, `checkpoint.json`. This fil
 
 Assets are stored in the same directory as `checkpoint.json`, and are relative to the directory.
 
-Thus the files for a test case with two images and a plot would look like this:
+Thus the files for a test case with two images and a figure would look like this:
 
 ```
 ./.pytest-visual/checkpoint/tests/test_one.py/test_something/checkpoint.json
 ./.pytest-visual/checkpoint/tests/test_one.py/test_something/assets/0/image_0.jpg
 ./.pytest-visual/checkpoint/tests/test_one.py/test_something/assets/0/image_1.jpg
-./.pytest-visual/checkpoint/tests/test_one.py/test_something/assets/0/plot_0.json
+./.pytest-visual/checkpoint/tests/test_one.py/test_something/assets/0/figure_0.json
 ```
 
 ### Comparison of statements
@@ -90,4 +90,4 @@ All statements must match, or test case is failed.
 
 ### `MaterialStatement` and `ReferenceStatement` Pydantic models
 
-In-memory statements are represented by the `MaterialStatement` and `ReferenceStatement` Pydantic models. The `MaterialStatement` model contains everything including the assets as numpy arrays or plots, while the `ReferenceStatement` model only contains string filenames of these assets. Thus `ReferenceStatement` directly maps one-to-one to the JSON representation, and is directly used during the conversion process. `MaterialStatement` on the other hand is used while collecting data from the test case and showing results.
+In-memory statements are represented by the `MaterialStatement` and `ReferenceStatement` Pydantic models. The `MaterialStatement` model contains everything including the assets as numpy arrays or plotly figures, while the `ReferenceStatement` model only contains string filenames of these assets. Thus `ReferenceStatement` directly maps one-to-one to the JSON representation, and is directly used during the conversion process. `MaterialStatement` on the other hand is used while collecting data from the test case and showing results.

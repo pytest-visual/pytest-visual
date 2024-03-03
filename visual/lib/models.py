@@ -18,7 +18,7 @@ class ReferenceStatement(BaseModel):
 
     @validator("Type")
     def type_must_be_in_allowed_values(cls, v):
-        allowed_values = {"text", "images", "plot"}
+        allowed_values = {"text", "images", "figure"}
         if v not in allowed_values:
             raise ValueError(f"Type must be one of {allowed_values}")
         return v

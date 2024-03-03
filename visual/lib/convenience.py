@@ -66,7 +66,7 @@ def get_image_max_value_from_type(max_value: Optional[float], image: np.ndarray)
     raise ValueError(f"Could not determine max value from image with dtype {image.dtype}")
 
 
-def create_plot_from_images(
+def create_figure_from_images(
     images: List[np.ndarray],
     labels: Optional[List[str]],
     grid_shape: Tuple[int, int],
