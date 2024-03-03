@@ -9,7 +9,7 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 from dash import Dash, Input, Output, ctx, dcc, html
 
-from visual.lib.flags import get_visualization_flags
+from visual.lib.flags import get_visualization_flags, print_visualization_message
 from visual.lib.storage import MaterialStatement
 
 logging.basicConfig(level=logging.INFO)  # To see Dash url
@@ -24,9 +24,7 @@ finish_delay = 1.0
 
 _global_button_clicked: Optional[str] = None
 
-print()
-print(f"-----  Visualizations will be shown at http://127.0.0.1:{port_number}  -----")
-print()
+print_visualization_message(port_number)
 
 
 @pytest.fixture(scope="session")

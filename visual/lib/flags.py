@@ -1,7 +1,22 @@
+import sys
 from typing import Tuple
 
 from _pytest.config.argparsing import Parser
 from _pytest.fixtures import FixtureRequest
+
+
+def print_visualization_message(port_number: int) -> None:
+    """
+    Prints a message to the console about the visualization server.
+
+    Parameters:
+    - port_number (int): The port number where the visualization server is running.
+    """
+
+    if "--visual" in sys.argv:
+        print()
+        print(f"-----  Visualizations will be shown at http://127.0.0.1:{port_number}  -----")
+        print()
 
 
 def pytest_addoption(parser: Parser):
