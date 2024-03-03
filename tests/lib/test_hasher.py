@@ -6,7 +6,8 @@ from visual.lib.hasher import (
     FixedPattern,
     hash_text,
     vector_hash_array,
-    vector_hash_equal_mean,
+    vector_hash_equal,
+    vector_hash_threshold
 )
 
 # Test FixedPattern
@@ -67,5 +68,6 @@ def test_vector_hash_similarity():
     hash2 = vector_hash_array(array2)
     hash3 = vector_hash_array(array3)
 
-    assert vector_hash_equal_mean(hash1, hash2, 100, 255)
-    assert not vector_hash_equal_mean(hash1, hash3, 100, 255)
+    threshold = vector_hash_threshold(cells_different=100, cell_range=255)
+    assert vector_hash_equal(hash1, hash2, threshold)
+    assert not vector_hash_equal(hash1, hash3, threshold)

@@ -2,12 +2,14 @@ import json
 import os
 import shutil
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Any
 
 from _pytest.fixtures import FixtureRequest
+import plotly
+from PIL import Image
+import numpy as np
 
-Statement = List[str]  # Essentially a tuple: ["text" | "figure" | "images", item]
-
+from visual.lib.models import MaterialStatement, ReferenceStatement
 
 def get_storage_path(request: FixtureRequest) -> Path:
     """
@@ -24,32 +26,83 @@ def get_storage_path(request: FixtureRequest) -> Path:
     function_name = request.node.name
 
     relative_path = module_path.relative_to(root_path)
-    return root_path / ".pytest-visual" / relative_path / function_name
+    return root_path / ".pytest-visual" / "checkpoint" / relative_path / function_name
 
 
-def load_statements(storage_path: Path) -> Optional[List[Statement]]:
-    statements_path = storage_path / _statements_file
-    if statements_path.exists():
-        with statements_path.open("r") as f:
-            return json.load(f)
+def load_statement_references(storage_path: Path) -> Optional[List[ReferenceStatement]]:
+    checkpoint_path = storage_path / _checkpoint_file
+    if checkpoint_path.exists():
+        with checkpoint_path.open("r") as f:
+            statements_dict_list = json.load(f)["statements"]
+            reference_statements: List[ReferenceStatement] = []
+            for statement_dict in statements_dict_list:
+                reference_statements.append(ReferenceStatement(**statement_dict))
+            return reference_statements
     else:
         return None
 
 
-def store_statements(storage_path: Path, statements: List[Statement]) -> None:
-    """
-    Stores the statements in the given path as a JSON file.
-    The statements are stored in a list of [name, statement_str] pairs,
-    where name is the name of the statement type and statement_str is the string representation of the statement.
-    """
-    os.makedirs(storage_path, exist_ok=True)
-    with (storage_path / _statements_file).open("w") as f:
-        json.dump(statements, f, indent=4)
+def materialize_assets(reference: ReferenceStatement, prefix_path: Path) -> MaterialStatement:
+    materialized_assets: List[Any] = []
+    for asset in reference.Assets:
+        full_path = prefix_path / asset
+        if reference.Type == "plot":
+            materialized_assets.append(plotly.io.read_json(full_path))
+        if reference.Type == "images":
+            materialized_assets.append(np.array(Image.open(full_path)))
+
+    return MaterialStatement(
+        Type=reference.Type,
+        Content=reference.Content,
+        Assets=materialized_assets,
+        Hash=reference.Hash,
+        HashVectors=reference.HashVectors,
+        Metadata=reference.Metadata,
+    )
 
 
-def clear_statements(storage_path: Path) -> None:
+def store_statements(storage_dir: Path, materials: List[MaterialStatement]) -> None:
+    """
+    Stores the statements and their assets in the given directory.
+    """
+
+    references: List[ReferenceStatement] = []
+    for statement_idx, material in enumerate(materials):
+        asset_ref_list: List[str] = []
+        for asset_idx, asset in enumerate(material.Assets):
+            if material.Type == "plot":
+                ref = Path("assets") / str(statement_idx) / f"plot_{asset_idx}.json"
+                os.makedirs((storage_dir / ref).parent, exist_ok=True)
+                plotly.io.write_json(asset, storage_dir / ref)
+                asset_ref_list.append(str(ref))
+
+            elif material.Type == "images":
+                ref = Path("assets") / str(statement_idx) / f"image_{asset_idx}.jpg"
+                os.makedirs((storage_dir / ref).parent, exist_ok=True)
+                Image.fromarray(asset).save(storage_dir / ref)
+                asset_ref_list.append(str(ref))
+
+        ref = ReferenceStatement(
+            Type=material.Type,
+            Content=material.Content,
+            Assets=asset_ref_list,
+            Hash=material.Hash,
+            HashVectors=material.HashVectors,
+            Metadata=material.Metadata,
+        )
+        references.append(ref)
+
+    os.makedirs(storage_dir, exist_ok=True)
+    #with (storage_dir / _checkpoint_file).open("w") as f:
+    #    json.dump(materials, f, indent=4) # Doesn't work with pydantic models
+
+    with (storage_dir / _checkpoint_file).open("w") as f:
+        json.dump({"statements": [r.model_dump() for r in references]}, f, indent=4)
+
+
+def clear_checkpoints(storage_path: Path) -> None:
     if storage_path.exists():  # This is a directory
         shutil.rmtree(storage_path)
 
 
-_statements_file = "statements.json"
+_checkpoint_file = "checkpoint.json"

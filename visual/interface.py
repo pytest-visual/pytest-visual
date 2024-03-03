@@ -15,16 +15,19 @@ from visual.lib.convenience import (
     get_grid_shape,
     get_image_max_value_from_type,
     get_layout_from_image,
+    statement_lists_equal,
 )
 from visual.lib.flags import get_visualization_flags, pytest_addoption
 from visual.lib.storage import (
-    Statement,
-    clear_statements,
+    clear_checkpoints,
     get_storage_path,
-    load_statements,
+    load_statement_references,
+    materialize_assets,
     store_statements,
 )
+from visual.lib.models import MaterialStatement
 from visual.lib.ui import UI, Location, visual_UI
+from visual.lib.hasher import hash_text, vector_hash_equal
 
 
 class VisualFixture:
@@ -32,7 +35,7 @@ class VisualFixture:
         """
         An object to collect visualization statements.
         """
-        self.statements: List[Statement] = []
+        self.statements: List[MaterialStatement] = []
 
     # Core interface
 
@@ -43,7 +46,9 @@ class VisualFixture:
         Parameters:
         - text (str): The text to show.
         """
-        self.statements.append(["text", text])
+        hsh = hash_text(text)
+        statement = MaterialStatement(Type="text", Content=text, Hash=hsh)
+        self.statements.append(statement)
 
     def figure(self, figure: Figure) -> None:
         """
@@ -52,7 +57,9 @@ class VisualFixture:
         Parameters:
         - fig (Figure): The figure to show.
         """
-        self.statements.append(["figure", str(figure.to_json())])
+        hsh = hash_text(str(figure.to_json()))
+        statement = MaterialStatement(Type="figure", Assets=[figure], Hash=hsh)
+        self.statements.append(statement)
 
     def images(
         self,
@@ -62,7 +69,7 @@ class VisualFixture:
         image_size: float = 300,
     ) -> None:
         """
-        Convenience method to show a grid of images. Only accepts standardized numpy images.
+        Method to show a grid of images. Only accepts standardized numpy images.
 
         Parameters:
         - images (List[np.ndarray]): A list of images to show.
@@ -74,7 +81,7 @@ class VisualFixture:
         assert len(images) > 0, "At least one image must be specified"
 
         grid_shape = get_grid_shape(len(images), max_cols)
-        total_height = None if image_size is None else image_size * grid_shape[0]
+        total_height = image_size * grid_shape[0]
 
         figure = create_plot_from_images(images, labels, grid_shape, total_height)
         self.figure(figure)
@@ -160,10 +167,10 @@ def visual(request: FixtureRequest, visual_UI: UI) -> Generator[VisualFixture, N
         if not yes_all:
             # Read previous statements
             location = Location(request.node.module.__file__, request.node.name)  # type: ignore
-            prev_statements = load_statements(storage_path)
+            prev_statements = load_statement_references(storage_path)
 
-            # Check if statements have changed, and prompt user if so
-            if statements != prev_statements:
+            # Prompt user if statements have changed
+            if prev_statements is None or not statement_lists_equal(statements, prev_statements):
                 if not visual_UI.prompt_user(location, prev_statements, statements):
                     pytest.fail("Visualizations were not accepted")
 
@@ -171,7 +178,7 @@ def visual(request: FixtureRequest, visual_UI: UI) -> Generator[VisualFixture, N
         store_statements(storage_path, statements)
     elif reset_all:
         # Reset visualization
-        clear_statements(storage_path)
+        clear_checkpoints(storage_path)
         pytest.skip("Resetting visualization case as per --visualize-reset-all")
     else:
         pytest.skip("Visualization is not enabled, add --visual option to enable")

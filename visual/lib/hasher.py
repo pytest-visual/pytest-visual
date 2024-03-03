@@ -98,25 +98,28 @@ def vector_hash_array(array: np.ndarray) -> np.ndarray:
     return hashed_array
 
 
-def vector_hash_equal_mean(hash1: np.ndarray, hash2: np.ndarray, cells_different: float, cell_range: float) -> bool:
+def vector_hash_equal(hash1: np.ndarray, hash2: np.ndarray, threshold_error: float) -> bool:
     """
     Check if two hashes are approximately equal. This is done by checking if the mean of the absolute difference between the hashes is less than a certain threshold.
     """
 
     mean_diff = compute_vector_hash_mean_diff(hash1, hash2)
-    threshold = compute_vector_hash_threshold(cells_different, cell_range)
-    return mean_diff < threshold
+    return mean_diff < threshold_error
 
 
 def compute_vector_hash_mean_diff(hash1: np.ndarray, hash2: np.ndarray) -> float:
     """
     Compute the mean difference between two hashes.
     """
+    if hash1.size == hash2.size == 0:
+        return 0.0
+    if hash1.size != hash2.size:
+        raise ValueError("Comparing two unequal sized hashes")
 
     return math.sqrt(np.mean((hash1 - hash2) ** 2))
 
 
-def compute_vector_hash_threshold(cells_different: float, cell_range: float) -> float:
+def vector_hash_threshold(cells_different: float, cell_range: float) -> float:
     """
     Compute the threshold for comparing hashes. Note that such a threshold may fail even when less cells are different than expected, but it asymptotically approaches the expected value as the number of cells increases.
     """
