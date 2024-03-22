@@ -21,7 +21,11 @@ def get_storage_path_fixture(request) -> Path:
 
 def test_storage_path(get_storage_path_fixture: Path):
     storage_path = get_storage_path_fixture
-    assert storage_path == Path(".pytest-visual/checkpoint/tests/lib/test_storage.py/test_storage_path").absolute()
+    current_path = Path(__file__).parent
+    assert (
+        storage_path
+        == (current_path.parent.parent / Path(".pytest-visual/checkpoint/tests/lib/test_storage.py/test_storage_path")).absolute()
+    )
 
 
 def test_store_load_statements(get_storage_path_fixture):
