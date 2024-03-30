@@ -38,7 +38,7 @@ def test_store_load_statements(get_storage_path_fixture):
 
     # Store statements
     stored_mats: List[MaterialStatement] = []
-    stored_mats.append(MaterialStatement(Type="text", Content="This is a test", Hash="123"))
+    stored_mats.append(MaterialStatement(Type="text", Text="This is a test", Hash="123"))
     stored_mats.append(MaterialStatement(Type="figure", Assets=[fig], Hash="456"))
     stored_mats.append(MaterialStatement(Type="images", Assets=[image, image], Hash="789", HashVectors=hash_vectors))
     store_statements(get_storage_path_fixture, stored_mats)
@@ -52,7 +52,7 @@ def test_store_load_statements(get_storage_path_fixture):
     assert len(loaded_mats) == len(stored_mats)
     for loaded, stored in zip(loaded_mats, stored_mats):
         assert loaded.Type == stored.Type
-        assert loaded.Content == stored.Content
+        assert loaded.Text == stored.Text
         assert loaded.Hash == stored.Hash
         if loaded.Type == "images":
             for loaded_asset, stored_asset in zip(loaded.Assets, stored.Assets):

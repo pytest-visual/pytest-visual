@@ -47,7 +47,7 @@ class VisualFixture:
         - text (str): The text to show.
         """
         hsh = hash_text(text)
-        statement = MaterialStatement(Type="text", Content=text, Hash=hsh)
+        statement = MaterialStatement(Type="text", Text=text, Hash=hsh)
         self.statements.append(statement)
 
     def figure(self, figure: Figure) -> None:

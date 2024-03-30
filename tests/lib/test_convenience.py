@@ -70,7 +70,7 @@ def test_correct_layout():
 
 def test_statement_lists_equal():
     refs = [
-        ReferenceStatement(Type="text", Hash="", Content=""),
+        ReferenceStatement(Type="text", Hash="", Text=""),
         ReferenceStatement(Type="images", Hash=""),
         ReferenceStatement(Type="images", Hash="abc"),
         ReferenceStatement(Type="images", Hash="abc", HashVectors=HashVectors_(Vectors=[[1.0, 2.0, 3.0]], ErrorThreshold=0.1)),

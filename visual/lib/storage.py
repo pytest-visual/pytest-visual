@@ -54,7 +54,7 @@ def materialize_assets(reference: ReferenceStatement, prefix_path: Path) -> Mate
 
     return MaterialStatement(
         Type=reference.Type,
-        Content=reference.Content,
+        Text=reference.Text,
         Assets=materialized_assets,
         Hash=reference.Hash,
         HashVectors=reference.HashVectors,
@@ -85,7 +85,7 @@ def store_statements(storage_dir: Path, materials: List[MaterialStatement]) -> N
 
         ref = ReferenceStatement(
             Type=material.Type,
-            Content=material.Content,
+            Text=material.Text,
             Assets=asset_ref_list,
             Hash=material.Hash,
             HashVectors=material.HashVectors,

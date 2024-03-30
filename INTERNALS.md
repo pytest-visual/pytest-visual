@@ -58,7 +58,7 @@ Each test case directory contains at least one file, `checkpoint.json`. This fil
   "statements": [
     {
       "Type": "text" | "images" | "figure",
-      "Content": "Some text",  # Only for "text" type
+      "Text": "Some text",  # Only for "text" type
       "Assets": [] | ["assets/0/image_0.jpg", "assets/0/image_1.jpg"] | ["assets/0/figure_0.json"]
       "Hash": "hash of the content"  # Hash of the content, figure or image metadata
       "HashVectors": {

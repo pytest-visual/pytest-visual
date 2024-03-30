@@ -230,7 +230,7 @@ class UI:
         else:
             for statement in statements:
                 if statement.Type == "text":
-                    rendered_statements.append(html.Code(statement.Content, style=code_style))
+                    rendered_statements.append(html.Code(statement.Text, style=code_style))
                 elif statement.Type == "figure":
                     assert len(statement.Assets) == 1, "A figure statement should have exactly one asset"
                     figure = statement.Assets[0]
