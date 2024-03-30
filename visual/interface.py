@@ -58,7 +58,7 @@ class VisualFixture:
         - fig (Figure): The figure to show.
         """
         hsh = hash_text(str(figure.to_json()))
-        statement = MaterialStatement(Type="figure", Assets=[figure], Hash=hsh)
+        statement = MaterialStatement(Type="figure", Asset=figure, Hash=hsh)
         self.statements.append(statement)
 
     def images(
@@ -130,12 +130,12 @@ class VisualFixture:
         plot.visual_graph.render(tempfile_path, format="png")
 
         # Read image and show
-        image = np.array(Image.open(tempfile_path + ".png"))
+        image = np.array(Image.open(f"{tempfile_path}.png"))
         self.image(image, image_size=image_size)
 
         # Remove temporary file
         os.remove(tempfile_path)
-        os.remove(tempfile_path + ".png")
+        os.remove(f"{tempfile_path}.png")
 
 
 @pytest.fixture

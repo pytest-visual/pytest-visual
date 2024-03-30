@@ -1,24 +1,26 @@
-from typing import Any, List, Optional
+from typing import List, Literal, Optional, Union
 
+import numpy as np
+from plotly.graph_objs import Figure
 from pydantic import BaseModel, Field, validator
 
 
-class HashVectors_(BaseModel):
-    Vectors: List[List[float]]
+class HashVector_(BaseModel):
+    Vector: List[float]
     ErrorThreshold: float
 
 
 class ReferenceStatement(BaseModel):
-    Type: str
+    Type: Literal["text", "image", "figure"]
     Text: Optional[str] = None
-    Assets: List[str] = []
+    Asset: Optional[str] = None
     Hash: str
-    HashVectors: Optional[HashVectors_] = None
+    HashVector: Optional[HashVector_] = None
     Metadata: dict = {}
 
     @validator("Type")
     def type_must_be_in_allowed_values(cls, v: str) -> str:
-        allowed_values = {"text", "images", "figure"}
+        allowed_values = {"text", "image", "figure"}
         if v not in allowed_values:
             raise ValueError(f"Type must be one of {allowed_values}")
         return v
@@ -33,9 +35,12 @@ class ReferenceStatement(BaseModel):
 
 
 class MaterialStatement(BaseModel):
-    Type: str
+    class Config:
+        arbitrary_types_allowed = True
+
+    Type: Literal["text", "image", "figure"]
     Text: Optional[str] = None
-    Assets: List[Any] = []
+    Asset: Optional[Union[np.ndarray, Figure]] = None
     Hash: str
-    HashVectors: Optional[HashVectors_] = None
+    HashVector: Optional[HashVector_] = None
     Metadata: dict = {}

@@ -8,6 +8,7 @@ import plotly
 import pytest
 from _pytest.fixtures import FixtureRequest
 from dash import Dash, Input, Output, ctx, dcc, html
+from plotly.graph_objs import Figure
 
 from visual.lib.flags import get_visualization_flags, print_visualization_message
 from visual.lib.storage import MaterialStatement
@@ -232,9 +233,8 @@ class UI:
                 if statement.Type == "text":
                     rendered_statements.append(html.Code(statement.Text, style=code_style))
                 elif statement.Type == "figure":
-                    assert len(statement.Assets) == 1, "A figure statement should have exactly one asset"
-                    figure = statement.Assets[0]
-                    rendered_statements.append(dbc.Card(dcc.Graph(figure=figure), style=plot_style))
+                    assert type(statement.Asset) == Figure, "A figure statement must have a Figure asset"
+                    rendered_statements.append(dbc.Card(dcc.Graph(figure=statement.Asset), style=plot_style))
                 else:
                     raise ValueError(f"Invalid command {statement.Type}")
 

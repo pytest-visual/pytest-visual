@@ -143,11 +143,11 @@ def statement_lists_equal(prev_statements: List[MaterialStatement], statements: 
             return False
         if prev.Hash != now.Hash:
             return False
-        if (prev.HashVectors is None) != (now.HashVectors is None):
+        if (prev.HashVector is None) != (now.HashVector is None):
             return False
-        if prev.HashVectors is not None and now.HashVectors is not None:
+        if prev.HashVector is not None and now.HashVector is not None:
             if not vector_hash_equal(
-                np.asarray(prev.HashVectors.Vectors), np.asarray(now.HashVectors.Vectors), prev.HashVectors.ErrorThreshold
+                np.asarray(prev.HashVector.Vector), np.asarray(now.HashVector.Vector), prev.HashVector.ErrorThreshold
             ):
                 return False
 

@@ -2,12 +2,13 @@ import json
 import os
 import shutil
 from pathlib import Path
-from typing import Any, List, Optional
+from typing import List, Optional, Union
 
 import numpy as np
 import plotly
 from _pytest.fixtures import FixtureRequest
 from PIL import Image
+from plotly.graph_objs import Figure
 
 from visual.lib.models import MaterialStatement, ReferenceStatement
 
@@ -44,20 +45,20 @@ def load_statement_references(storage_path: Path) -> Optional[List[ReferenceStat
 
 
 def materialize_assets(reference: ReferenceStatement, prefix_path: Path) -> MaterialStatement:
-    materialized_assets: List[Any] = []
-    for asset in reference.Assets:
-        full_path = prefix_path / asset
+    materialized_asset: Optional[Union[np.ndarray, Figure]] = None
+    if reference.Asset is not None:
+        full_path = prefix_path / reference.Asset
         if reference.Type == "figure":
-            materialized_assets.append(plotly.io.read_json(full_path))
-        if reference.Type == "images":
-            materialized_assets.append(np.array(Image.open(full_path)))
+            materialized_asset = plotly.io.read_json(full_path)
+        if reference.Type == "image":
+            materialized_asset = np.array(Image.open(full_path))
 
     return MaterialStatement(
         Type=reference.Type,
         Text=reference.Text,
-        Assets=materialized_assets,
+        Asset=materialized_asset,
         Hash=reference.Hash,
-        HashVectors=reference.HashVectors,
+        HashVector=reference.HashVector,
         Metadata=reference.Metadata,
     )
 
@@ -69,26 +70,28 @@ def store_statements(storage_dir: Path, materials: List[MaterialStatement]) -> N
 
     references: List[ReferenceStatement] = []
     for statement_idx, material in enumerate(materials):
-        asset_ref_list: List[str] = []
-        for asset_idx, asset in enumerate(material.Assets):
+        asset_ref: Optional[str] = None
+        if material.Asset is not None:
             if material.Type == "figure":
-                ref = Path("assets") / str(statement_idx) / f"figure_{asset_idx}.json"
+                assert isinstance(material.Asset, Figure)
+                ref = Path("assets") / f"{statement_idx}_figure.json"
                 os.makedirs((storage_dir / ref).parent, exist_ok=True)
-                plotly.io.write_json(asset, storage_dir / ref)
-                asset_ref_list.append(str(ref))
+                plotly.io.write_json(material.Asset, storage_dir / ref)
+                asset_ref = str(ref)
 
-            elif material.Type == "images":
-                ref = Path("assets") / str(statement_idx) / f"image_{asset_idx}.jpg"
+            elif material.Type == "image":
+                assert isinstance(material.Asset, np.ndarray)
+                ref = Path("assets") / f"{statement_idx}_image.jpg"
                 os.makedirs((storage_dir / ref).parent, exist_ok=True)
-                Image.fromarray(asset).save(storage_dir / ref)
-                asset_ref_list.append(str(ref))
+                Image.fromarray(material.Asset).save(storage_dir / ref)
+                asset_ref = str(ref)
 
         ref = ReferenceStatement(
             Type=material.Type,
             Text=material.Text,
-            Assets=asset_ref_list,
+            Asset=asset_ref,
             Hash=material.Hash,
-            HashVectors=material.HashVectors,
+            HashVector=material.HashVector,
             Metadata=material.Metadata,
         )
         references.append(ref)

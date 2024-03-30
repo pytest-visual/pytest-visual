@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 from plotly import graph_objs as go
 
-from visual.lib.models import HashVectors_, MaterialStatement, ReferenceStatement
+from visual.lib.models import HashVector_, MaterialStatement, ReferenceStatement
 from visual.lib.storage import (
     get_storage_path,
     load_statement_references,
@@ -29,18 +29,16 @@ def test_storage_path(get_storage_path_fixture: Path):
 
 
 def test_store_load_statements(get_storage_path_fixture):
-    print("Storage path:", get_storage_path_fixture)
-
     # Create assets
     fig = go.Figure(data=go.Scatter(x=[1, 2, 3], y=[4, 1, 2]))
     image = np.ones((100, 100, 3), dtype=np.uint8)
-    hash_vectors = HashVectors_(Vectors=[[1, 2, 3], [4, 5, 6]], ErrorThreshold=0.1)
+    hash_vector = HashVector_(Vector=[1, 2, 3], ErrorThreshold=0.1)
 
     # Store statements
     stored_mats: List[MaterialStatement] = []
     stored_mats.append(MaterialStatement(Type="text", Text="This is a test", Hash="123"))
-    stored_mats.append(MaterialStatement(Type="figure", Assets=[fig], Hash="456"))
-    stored_mats.append(MaterialStatement(Type="images", Assets=[image, image], Hash="789", HashVectors=hash_vectors))
+    stored_mats.append(MaterialStatement(Type="figure", Asset=fig, Hash="456"))
+    stored_mats.append(MaterialStatement(Type="image", Asset=image, Hash="789", HashVector=hash_vector))
     store_statements(get_storage_path_fixture, stored_mats)
 
     # Load/materialize statements
@@ -54,10 +52,10 @@ def test_store_load_statements(get_storage_path_fixture):
         assert loaded.Type == stored.Type
         assert loaded.Text == stored.Text
         assert loaded.Hash == stored.Hash
-        if loaded.Type == "images":
-            for loaded_asset, stored_asset in zip(loaded.Assets, stored.Assets):
-                assert np.array_equal(loaded_asset, stored_asset)  # Jpeg compression does not change constant images
+        if loaded.Type == "image":
+            assert type(loaded.Asset) == np.ndarray and type(stored.Asset) == np.ndarray
+            assert np.array_equal(loaded.Asset, stored.Asset)  # Jpeg compression does not change constant images
         else:
-            assert loaded.Assets == stored.Assets
-        assert loaded.HashVectors == stored.HashVectors
+            assert loaded.Asset == stored.Asset
+        assert loaded.HashVector == stored.HashVector
         assert loaded.Metadata == stored.Metadata
