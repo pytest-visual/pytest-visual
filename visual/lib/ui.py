@@ -51,7 +51,7 @@ class UI:
         Initializes the UI object, setting up the app, the layout, and starting a thread to run the server.
         The callbacks for the interactive elements in the UI are also defined within this method.
         """
-        self.app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+        self.app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP], title="Visual Testing")
         self.app.layout = self._draw_initial_layout()
 
         self._render_blank()
