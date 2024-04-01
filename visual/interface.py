@@ -6,6 +6,7 @@ from typing import Generator, List, Optional
 import numpy as np
 import pytest
 from _pytest.fixtures import FixtureRequest
+from dash_canvas.utils import array_to_data_url
 from PIL import Image
 from plotly.graph_objs import Figure
 
@@ -18,8 +19,8 @@ from visual.lib.convenience import (
     statement_lists_equal,
 )
 from visual.lib.flags import get_visualization_flags, pytest_addoption
-from visual.lib.hasher import hash_text, vector_hash_equal
-from visual.lib.models import MaterialStatement
+from visual.lib.hasher import hash_text, vector_hash_array, vector_hash_equal
+from visual.lib.models import HashVector_, MaterialStatement, ReferenceStatement
 from visual.lib.storage import (
     clear_checkpoints,
     get_storage_path,
@@ -61,6 +62,29 @@ class VisualFixture:
         statement = MaterialStatement(Type="figure", Asset=figure, Hash=hsh)
         self.statements.append(statement)
 
+    def image(
+        self,
+        image: np.ndarray,
+        label: Optional[str] = None,
+        error_threshold: float = 10,
+    ) -> None:
+        """
+        Convenience method to show a single image. Only accepts standardized numpy images.
+
+        Parameters:
+        - image (np.ndarray): The image to show.
+        - label (Optional[str]): A label for the image.
+        """
+
+        # Currently ignoring label
+        # labels = None if label is None else [label]
+
+        hsh = hash_text(f"Shape: {image.shape}, dtype: {image.dtype}, label: {label}")
+        hsh_vector = vector_hash_array(image)
+        hash_vector_with_error = HashVector_(Vector=hsh_vector.tolist(), ErrorThreshold=error_threshold)
+        statement = MaterialStatement(Type="image", Asset=image, Hash=hsh, HashVector=hash_vector_with_error)
+        self.statements.append(statement)
+
     def images(
         self,
         images: List[np.ndarray],
@@ -88,29 +112,11 @@ class VisualFixture:
 
     # Convenience interface
 
-    def image(
-        self,
-        image: np.ndarray,
-        label: Optional[str] = None,
-        image_size: float = 600,
-    ) -> None:
-        """
-        Convenience method to show a single image. Only accepts standardized numpy images.
-
-        Parameters:
-        - image (np.ndarray): The image to show.
-        - label (Optional[str]): A label for the image.
-        - image_size (float): The height of the image.
-        """
-        labels = None if label is None else [label]
-        self.images([image], labels, max_cols=1, image_size=image_size)
-
     def model(
         self,
         model,
         input_size,
         depth: int = 100,
-        image_size: float = 1500,
     ) -> None:
         """
         Convenience method to show a PyTorch model. Requires the torchview package.
@@ -119,7 +125,6 @@ class VisualFixture:
         - model (torch.nn.Module): The model to show.
         - input_size (Tuple[int, ...]): The input size of the model.
         - depth (int): The maximum depth of the model to show.
-        - image_size (float): The height of the image.
         """
         import torchview  # isort: skip
 
@@ -131,7 +136,7 @@ class VisualFixture:
 
         # Read image and show
         image = np.array(Image.open(f"{tempfile_path}.png"))
-        self.image(image, image_size=image_size)
+        self.image(image)
 
         # Remove temporary file
         os.remove(tempfile_path)

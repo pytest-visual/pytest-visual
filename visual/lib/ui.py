@@ -1,13 +1,17 @@
+import base64
 import logging
 import threading
 import time
+from io import BytesIO
 from typing import Generator, List, Optional
 
 import dash_bootstrap_components as dbc
+import numpy as np
 import plotly
 import pytest
 from _pytest.fixtures import FixtureRequest
 from dash import Dash, Input, Output, ctx, dcc, html
+from PIL import Image
 from plotly.graph_objs import Figure
 
 from visual.lib.flags import get_visualization_flags, print_visualization_message
@@ -128,7 +132,6 @@ class UI:
 
         self.prev_statements = self._render_statements_in_div(prev_statements, "prev-statements")
         self.curr_statements = self._render_statements_in_div(curr_statements, "curr-statements")
-
         return self._get_accept_decline()
 
     def _draw_initial_layout(self) -> html.Div:
@@ -209,6 +212,13 @@ class UI:
         """
         Renders statements into a specified division in the UI.
         Each statement could either be a text statement, plotly figure, or images.
+
+        Parameters:
+        - statements (Optional[List[MaterialStatement]]): A list of statements to render.
+        - div_id (str): The id of the division to render the statements into.
+
+        Returns:
+        - div (dbc.CardBody): The division containing the rendered statements.
         """
 
         code_style = {
@@ -235,6 +245,10 @@ class UI:
                 elif statement.Type == "figure":
                     assert type(statement.Asset) == Figure, "A figure statement must have a Figure asset"
                     rendered_statements.append(dbc.Card(dcc.Graph(figure=statement.Asset), style=plot_style))
+                elif statement.Type == "image":
+                    assert type(statement.Asset) == np.ndarray, "An image statement must have a numpy array asset"
+                    image_str = create_string_image(statement.Asset)
+                    rendered_statements.append(dbc.Card(html.Img(src=image_str), style=plot_style))
                 else:
                     raise ValueError(f"Invalid command {statement.Type}")
 
@@ -266,3 +280,12 @@ class Location:
     def __init__(self, file_name: str, function_name: str) -> None:
         self.file_name = file_name
         self.function_name = function_name
+
+
+def create_string_image(np_array: np.ndarray, ext="bmp") -> str:
+    im = Image.fromarray(np_array)
+    buffer = BytesIO()
+    im.save(buffer, format=ext)
+    encoded = base64.b64encode(buffer.getvalue()).decode("utf-8")
+
+    return f"data:image/{ext};base64, " + encoded

@@ -77,7 +77,7 @@ def visualize_dataset(visual: VisualFixture, dataset: ClockCoordinateDataset):
 def test_model(visual: VisualFixture):
     model = get_model(pretrained=False)
     visual.text("Model high level structure: check that model head is in the correct position.")
-    visual.model(model, input_size=(1, 3, 224, 224), depth=1, image_size=2000)
+    visual.model(model, input_size=(1, 3, 224, 224), depth=1)
 
 
 def test_get_label():
