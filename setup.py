@@ -17,8 +17,11 @@ def get_requirements() -> List[str]:
     ]
 
 
-version = os.getenv("RELEASE_VERSION", "0.0.1")
-assert version is not None, "RELEASE_VERSION environment variable must be set, this is typically done by the release pipeline."
+version = os.getenv("RELEASE_VERSION", "v0.0.1")
+if version.startswith("v"):
+    version = version[1:]
+
+print(f"Building pytest-visual {version}")
 
 setup(
     name="pytest-visual",
@@ -32,7 +35,7 @@ setup(
     license="MIT",
     license_files=["LICENSE"],
     author="Kristjan Kongas",
-    url="https://github.com/kongaskristjan/pytest-visual",
+    url="https://github.com/pytest-visual/pytest-visual",
     classifiers=[
         "Development Status :: 4 - Beta",
         "License :: OSI Approved :: MIT License",
