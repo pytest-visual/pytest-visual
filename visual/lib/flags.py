@@ -1,6 +1,7 @@
 import sys
 from typing import Tuple
 
+from _pytest.config import Config
 from _pytest.config.argparsing import Parser
 from _pytest.fixtures import FixtureRequest
 
@@ -42,9 +43,13 @@ def get_visualization_flags(request: FixtureRequest) -> Tuple[bool, bool, bool]:
     - AssertionError: If more than one of the flags is set.
     """
 
-    visualize = bool(request.config.getoption("--visual"))
-    yes_all = bool(request.config.getoption("--visual-yes-all"))
-    reset_all = bool(request.config.getoption("--visual-reset-all"))
+    return get_options(request.config)
+
+
+def get_options(config: Config) -> Tuple[bool, bool, bool]:
+    visualize = bool(config.getoption("--visual"))
+    yes_all = bool(config.getoption("--visual-yes-all"))
+    reset_all = bool(config.getoption("--visual-reset-all"))
 
     assert visualize + yes_all + reset_all <= 1, "Only one of --visual, --visual-yes-all, --visual-reset-all can be set"
 

@@ -1,6 +1,5 @@
 import json
 import os
-import shutil
 from pathlib import Path
 from typing import List, Optional, Union
 
@@ -100,11 +99,6 @@ def store_statements(storage_dir: Path, materials: List[MaterialStatement]) -> N
 
     with (storage_dir / _checkpoint_file).open("w") as f:
         json.dump({"statements": [r.model_dump() for r in references]}, f, indent=2)
-
-
-def clear_checkpoints(storage_path: Path) -> None:
-    if storage_path.exists():  # This is a directory
-        shutil.rmtree(storage_path)
 
 
 _checkpoint_file = "checkpoint.json"

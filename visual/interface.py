@@ -1,6 +1,8 @@
 import os
 import random
+import shutil
 import tempfile
+from pathlib import Path
 from typing import Generator, List, Optional
 
 import numpy as np
@@ -17,11 +19,10 @@ from visual.lib.convenience import (
     get_layout_from_image,
     statement_lists_equal,
 )
-from visual.lib.flags import get_visualization_flags, pytest_addoption
+from visual.lib.flags import get_options, get_visualization_flags, pytest_addoption
 from visual.lib.hasher import hash_text, vector_hash_equal
 from visual.lib.models import MaterialStatement
 from visual.lib.storage import (
-    clear_checkpoints,
     get_storage_path,
     load_statement_references,
     materialize_assets,
@@ -180,10 +181,6 @@ def visual(request: FixtureRequest, visual_UI: UI) -> Generator[VisualFixture, N
 
         # No declined changes or --visual-yes-all flag set, so accept changes
         store_statements(storage_path, statements)
-    elif reset_all:
-        # Reset visualization
-        clear_checkpoints(storage_path)
-        pytest.skip("Resetting visualization case as per --visualize-reset-all")
     else:
         pytest.skip("Visualization is not enabled, add --visual option to enable")
 
@@ -257,3 +254,28 @@ def standardize(
     image = np.clip(image, 0, 255).astype(np.uint8)
 
     return image
+
+
+def pytest_collection_modifyitems(items, config):
+    """
+    If the --reset-all flag is set, all tests are marked as skipped,
+    and all test checkpoints are deleted.
+    """
+    run_visualization, yes_all, reset_all = get_options(config)
+
+    if reset_all:
+        # Skip all tests
+        for item in items:
+            item.add_marker(pytest.mark.skip(reason="Skipping all tests"))
+
+        # Find checkpoint paths
+        root_path = Path(config.rootdir)  # type: ignore
+        checkpoint_path = root_path / ".pytest-visual" / "checkpoint"
+
+        # Assert that checkpoint path's last parts are correct
+        assert checkpoint_path.parts[-2:] == (".pytest-visual", "checkpoint")
+
+        # Delete checkpoint path
+        print(f" Deleting checkpoints at {checkpoint_path}")
+        if checkpoint_path.exists():
+            shutil.rmtree(checkpoint_path)
