@@ -8,6 +8,8 @@ dist/
 Pipfile
 .python-version
 
+.agentIDE/
+
 data/
 
 examples/end_to_end/models/

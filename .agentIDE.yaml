@@ -1,0 +1,12 @@
+ignore:
+  - __pycache__/
+  - dist/
+  - examples/
+  - pytest-visual.egg-info/
+  - tests/
+  - INTERNALS.md
+  - LICENSE
+  - README.md
+  - requirements-dev.txt
+  - requirements.txt
+  - setup.py
