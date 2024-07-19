@@ -1,20 +1,20 @@
-# pytest-visual
+# pytest-visual - an elegant and scalable alternative to one-off visualization scripts
 
-`pytest-visual` introduces the concept of visual testing to ML (with automated change detection!).
+`pytest-visual` introduces the concept of visual testing to computer vision.
 
-## Problem statement
+## Why visual testing in the computer vision context?
 
-Most ML code is poorly tested. This is at least partially because a lot of ML code is very hard to test meaningfully.
+Visualization scripts are extremely useful when developing computer vision applications. However, because running and verifying each script is a manual process, bugs often go unnoticed. With `pytest-visual` however, visualizations are organized as part of unit tests, and you'll be notified of any changes in visualization outputs.
 
-For example, we can easily test whether an image data augmentation pipeline produces an image with the correct shape, but does the image also look realistic? And does augmentation produce enough variation? These tests might succeed, but that doesn't mean that your code works.
+Here's a quick comparison between visual testing and alternative approaches:
 
-## Solution - visual testing for ML
+| Visualization scripts                                 | Visual testing                                                    |
+|-------------------------------------------------------|-------------------------------------------------------------------|
+| May fail to catch bugs, as changes often go unnoticed | You'll always be notified of any changes in visualization outputs |
+| Easily get out of sync with main codebase             | Visualizations are continuously tested to be in sync              |
+| Tend to be poorly organized                           | Organization is enforced by the testing framework                 |
 
-`pytest-visual` aims to streamline the organization of visualizations in ML code, enhancing debugging, verification, and code clarity. It automatically detects changes in visualization outputs, presents them in your browser, and prompts for approval. Accepted changes are memorized and not prompted for again. As a result, your visualizations
-
-- **will actually catch bugs**, as changes won't go unnoticed.
-- **are always up to date**, as they're run on every `pytest-visual` invocation.
-- **won't clutter your production code**, as they're separated into test cases.
+As such, visual testing suits much better for ensuring long-term code quality.
 
 ## Example
 
@@ -35,7 +35,7 @@ def test_show_augmentations(visual, fix_seeds):
     visual.images(augmented)
 ```
 
-Then run `pytest --visualize`, and open the url displayed in the terminal window (most likely `http://127.0.0.1:54545`). If the visualization looks OK, click "Accept", and pytest should complete with success.
+Then run `pytest --visualize`, and open the url displayed in the terminal window (usually `http://127.0.0.1:54545`). If the visualization looks OK, click "Accept", and pytest should complete with success.
 
 You should see the following output:
 ![A before and after image showing the effect of data augmentation on a picture of a dog.](examples/screenshots/data_augmentation.jpg?raw=true)
@@ -88,7 +88,7 @@ With `pytest-visual` plugin, the following options are added to `pytest`:
 
 Yes. And this is exactly what you should be doing! Just omit the `visual` fixture, and it's a normal `pytest` test again.
 
-### Which parts of a typical ML codebase can be visually tested?
+### Which parts of a typical computer vision codebase can be visually tested?
 
 Visual testing can be used to verify the correctness of
 
@@ -98,29 +98,28 @@ Visual testing can be used to verify the correctness of
 - loss functions
 - learning rate schedules
 - detection algorithms
-- various filtering algorithms
-- etc.
+- various classical computer vision algorithms, eg. keypoint detection and matching
 
 ### My visual tests are flaky. Why?
 
-This is typically because your output is undeterministic. For example, plotting a loss over a short training run is probably not a good idea, as it will likely be different for each run. If you need it as a test, consider a normal unit test with some threshold for expected accuracy. Tiny floating point errors could lead to inconsistent output.
+This is because your output is not deterministic. For example, plotting a loss over a short training run is probably not a good idea, as it will likely be different for each run. If you need it as a test, consider a normal unit test with some threshold for expected accuracy. Tiny floating point errors could lead to inconsistent output.
 
 That said, we're planning to make `pytest-visual` robust to small fluctuations in output.
 
-### Why even bother testing ML code?
+### Why even bother testing ML/CV code?
 
-If you've implemented complex data processing logic, custom neural network architectures, advanced post processing steps, or tried to reproduce a paper, you know that bugs can take a very large part of the development effort. Reduced accuracy is often the only symptom of a bug. When conducting an ML experiment, it's typical to waste a lot of time on
+If you've implemented complex data processing logic, custom neural network architectures, advanced post processing steps, or tried to reproduce a paper, you know that bugs can take a very large part of the development effort. Reduced accuracy is often the only symptom of a bug. When conducting an experiment, it's not rare to waste time on
 
-- debugging when your ML code contains a bug,
-- debugging when your ML code doesn't contain a bug, but you don't know this,
-- revisiting an idea, because you're not sure whether your experiment was correct,
-- dropping a good idea because your experiment contained a bug, but you don't know this.
+- debugging when your code contains a bug that could have been prevented.
+- debugging when your code doesn't contain a bug, but you don't know this.
+- revisiting an idea, because you're not sure whether your experiment was correct.
+- dropping a good idea because your experiment contained a bug, but you didn't know this.
 
-Proper testing, including visual testing, can avoid a large portion of these headaches.
+High quality testing, which includes visualizations, can avoid a large portion of these headaches.
 
-### Isn't automation the whole point of unit testing automation? Now we have a potentially lazy/irresponsible human in the loop, who can just blindly "accept" a test.
+### Isn't automation the whole point of unit testing? Now we have a potentially lazy/irresponsible human in the test loop, who can just blindly "accept" a test.
 
-Full automation is a of course a great, but even the tests that are automatically run are written by people. Test quality can vary a lot, and tests written by a lazy/irresponsible person probably won't catch many bugs. Just having unit tests won't magically fix your code, but they are a very efficient tool to enable *responsible* developers write reliable code.
+Full automation is of course great, but even unit tests are written by people. Test quality can vary a lot, and tests written by a lazy/irresponsible person probably won't catch most bugs. Having unit tests won't magically fix your code, but they give a *responsible* developer the tools to write reliable code. Visual testing is one such powerful tool.
 
 ## Contributing
 
