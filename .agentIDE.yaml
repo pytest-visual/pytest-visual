@@ -2,7 +2,7 @@ ignore:
   - __pycache__/
   - dist/
   - examples/
-  - pytest-visual.egg-info/
+  - pytest_visual.egg-info/
   - tests/
   - INTERNALS.md
   - LICENSE

@@ -57,15 +57,12 @@ Each test case directory contains at least one file, `checkpoint.json`. This fil
 {
   "statements": [
     {
-      "Type": "text" | "images" | "figure",
-      "Text": "Some text",  # Only for "text" type
-      "Assets": None | "assets/0_image.jpg" | "assets/1_figure.json",
-      "Hash": "hash of the content",  # Hash of the content, figure or image metadata
+      "Image": "assets/0.jpg",
+      "Caption": "Some text",
       "HashVector": {
-        "Vector": array of shape (hash_vector_size),  # For approximate comparison of "images"
-        "ErrorThreshold": float  # For approximate comparison of "images"
+        "Vector": array of shape (hash_vector_size),  # For approximate comparison of images
+        "ErrorThreshold": float  # For approximate comparison of images
       },
-      "Metadata": {}  # Additional metadata
     },
   ]
 }
@@ -77,13 +74,13 @@ Thus the files for a test case with two images and a figure would look like this
 
 ```
 ./.pytest-visual/checkpoint/tests/test_one.py/test_something/checkpoint.json
-./.pytest-visual/checkpoint/tests/test_one.py/test_something/assets/0_image.jpg
-./.pytest-visual/checkpoint/tests/test_one.py/test_something/assets/1_figure.json
+./.pytest-visual/checkpoint/tests/test_one.py/test_something/assets/0.jpg
+./.pytest-visual/checkpoint/tests/test_one.py/test_something/assets/1.jpg
 ```
 
 ### Comparison of statements
 
-When a test case is run, the visualizations are compared to the previously stored visualizations. The comparison is done by comparing the hashes of the visualizations. The "hash" field in `checkpoint.json` must match the hash of the current visualization exactly, but the "hash_vectors" field must match up to accuracy specified when calling the function.
+When a test case is run, the visualizations are compared to the previously stored visualizations. The comparison is done by comparing the hashes of the visualizations. The `HashVectors` field in `checkpoint.json` must match the hash_vector of the current visualization up to the accuracy specified in `ErrorThreshold` when calling the function.
 
 All statements must match, or test case is failed.
 

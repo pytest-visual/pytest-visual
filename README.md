@@ -21,6 +21,8 @@ As such, visual testing suits much better for ensuring long-term code quality.
 In this example, we demonstrate how to create a basic visual test case. We first create a Python file with a prefix `test_*` (eg. `test_data_augmentation.py`), and add this function:
 
 ```python
+from visual.interface import VisualFixture, standardize
+
 # `visual` fixture indicates that the test results must be manually verified
 # `fix_seeds` fixture ensures deterministic results
 def test_show_augmentations(visual, fix_seeds):
@@ -30,9 +32,8 @@ def test_show_augmentations(visual, fix_seeds):
     augmented = [image.numpy() for image in augmented]  # pytest-visual accepts only numpy images
     augmented = [standardize(image) for image in augmented]  # Standardize image to uint8 with [0, 255] range and HWC format
 
-    # Show helpful text with images
-    visual.text("Doggos augmented")
-    visual.images(augmented)
+    # Show visualization
+    visual.images(augmented, caption="Doggos augmented")
 ```
 
 Then run `pytest --visualize`, and open the url displayed in the terminal window (usually `http://127.0.0.1:54545`). If the visualization looks OK, click "Accept", and pytest should complete with success.
