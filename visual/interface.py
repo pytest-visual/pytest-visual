@@ -151,7 +151,7 @@ def visual(request: FixtureRequest, visual_UI: UI) -> Generator[VisualFixture, N
     Yields:
     - VisualFixture: An object to collect visualization statements.
     """
-    run_visualization, yes_all, reset_all = get_visualization_flags(request)
+    run_visualization, accept_all, forget_all = get_visualization_flags(request)
     visualizer = VisualFixture()
     storage_path = get_storage_path(request)
 
@@ -165,7 +165,7 @@ def visual(request: FixtureRequest, visual_UI: UI) -> Generator[VisualFixture, N
 
         statements = visualizer.statements
 
-        if not yes_all:
+        if not accept_all:
             # Read previous statements
             location = Location(request.node.module.__file__, request.node.name)  # type: ignore
             prev_ref_statements = load_statement_references(storage_path)
@@ -179,7 +179,7 @@ def visual(request: FixtureRequest, visual_UI: UI) -> Generator[VisualFixture, N
                 if not visual_UI.prompt_user(location, prev_statements, statements):
                     pytest.fail("Visualizations were not accepted")
 
-        # No declined changes or --visual-yes-all flag set, so accept changes
+        # No declined changes or --visual-accept-all flag set, so accept changes
         store_statements(storage_path, statements)
     else:
         pytest.skip("Visualization is not enabled, add --visual option to enable")
@@ -258,12 +258,12 @@ def standardize(
 
 def pytest_collection_modifyitems(items, config):
     """
-    If the --reset-all flag is set, all tests are marked as skipped,
+    If the --visual-forget-all flag is set, all tests are marked as skipped,
     and all test checkpoints are deleted.
     """
-    run_visualization, yes_all, reset_all = get_options(config)
+    run_visualization, accept_all, forget_all = get_options(config)
 
-    if reset_all:
+    if forget_all:
         # Skip all tests
         for item in items:
             item.add_marker(pytest.mark.skip(reason="Skipping all tests"))

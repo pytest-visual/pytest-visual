@@ -22,8 +22,8 @@ def print_visualization_message(port_number: int) -> None:
 
 def pytest_addoption(parser: Parser):
     parser.addoption("--visual", action="store_true", help="Run visualization tests, prompt for acceptance")
-    parser.addoption("--visual-yes-all", action="store_true", help="Visualization tests are accepted without prompting")
-    parser.addoption("--visual-reset-all", action="store_true", help="Don't visualize, but mark all visualization cases as unaccepted")  # fmt: skip
+    parser.addoption("--visual-accept-all", action="store_true", help="Visualization tests are accepted without prompting")
+    parser.addoption("--visual-forget-all", action="store_true", help="Don't visualize, but mark all visualization cases as unaccepted")  # fmt: skip
 
 
 def get_visualization_flags(request: FixtureRequest) -> Tuple[bool, bool, bool]:
@@ -35,9 +35,9 @@ def get_visualization_flags(request: FixtureRequest) -> Tuple[bool, bool, bool]:
 
     Returns:
     - Tuple[bool, bool, bool]: A tuple containing three boolean values corresponding to whether each flag is set:
-        - run_visualization: True if visualization should be run (if --visual or --visual-yes-all is set).
-        - yes_all: True if --visual-yes-all flag is set.
-        - reset_all: True if --visual-reset-all flag is set.
+        - run_visualization: True if visualization should be run (if --visual or --visual-accept-all is set).
+        - accept_all: True if --visual-accept-all flag is set.
+        - forget_all: True if --visual-forget-all flag is set.
 
     Raises:
     - AssertionError: If more than one of the flags is set.
@@ -48,10 +48,10 @@ def get_visualization_flags(request: FixtureRequest) -> Tuple[bool, bool, bool]:
 
 def get_options(config: Config) -> Tuple[bool, bool, bool]:
     visualize = bool(config.getoption("--visual"))
-    yes_all = bool(config.getoption("--visual-yes-all"))
-    reset_all = bool(config.getoption("--visual-reset-all"))
+    accept_all = bool(config.getoption("--visual-accept-all"))
+    forget_all = bool(config.getoption("--visual-forget-all"))
 
-    assert visualize + yes_all + reset_all <= 1, "Only one of --visual, --visual-yes-all, --visual-reset-all can be set"
+    assert visualize + accept_all + forget_all <= 1, "Only one of --visual, --visual-accept-all, --visual-forget-all can be set"
 
-    run_visualization = visualize or yes_all
-    return run_visualization, yes_all, reset_all
+    run_visualization = visualize or accept_all
+    return run_visualization, accept_all, forget_all

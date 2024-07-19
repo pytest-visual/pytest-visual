@@ -36,7 +36,7 @@ def visual_UI(request: FixtureRequest) -> Generator[Optional["UI"], None, None]:
     The decision to yield a UI object or None is based on flags obtained from the test session configuration.
     The UI object, if created, runs a Dash server in a separate thread for the duration of the test session.
     """
-    run_visualization, yes_all, reset_all = get_visualization_flags(request)
+    run_visualization, accept_all, forget_all = get_visualization_flags(request)
     if run_visualization:  # Yield a UI object
         ui = UI()
         yield ui

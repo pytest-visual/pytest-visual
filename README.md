@@ -9,7 +9,7 @@ Visualization scripts are extremely useful when developing computer vision appli
 Here's a quick comparison between visual testing and alternative approaches:
 
 | Visualization scripts                                 | Visual testing                                                    |
-|-------------------------------------------------------|-------------------------------------------------------------------|
+| ----------------------------------------------------- | ----------------------------------------------------------------- |
 | May fail to catch bugs, as changes often go unnoticed | You'll always be notified of any changes in visualization outputs |
 | Easily get out of sync with main codebase             | Visualizations are continuously tested to be in sync              |
 | Tend to be poorly organized                           | Organization is enforced by the testing framework                 |
@@ -70,17 +70,18 @@ Then go to the root directory of this repository and run visualizations with
 pytest --visual
 ```
 
-and open your browser at the printed url. Do note that development dependencies are quite heavy (for example Pytorch CPU), but that's just the nature of most DL frameworks.
+and open your browser at the printed url.
 
 ## CLI usage
 
-With `pytest-visual` plugin, the following options are added to `pytest`:
+With `pytest-visual` plugin, the `--visual`, `--visual-accept-all` and `--visual-forget-all` options are added to `pytest`. Here's a quick doc to compare them:
 
-| Command                     | Description                                                                                        |
-| --------------------------- | -------------------------------------------------------------------------------------------------- |
-| `pytest --visual`           | Run pytest with visual tests, and prompt user for manual review on all detected changed.           |
-| `pytest --visual-yes-all`   | Accept everything without prompting. Useful when you clone a repository or check out a new branch. |
-| `pytest --visual-reset-all` | Mark all cases as declined.                                                                        |
+| Command                      | Description                                                                              |
+| ---------------------------- | ---------------------------------------------------------------------------------------- |
+| `pytest`                     | Run pytest, but skip all tests that are marked as visual.                                |
+| `pytest --visual`            | Run pytest with visual tests, and prompt user for manual review on all detected changed. |
+| `pytest --visual-accept-all` | Accept all visual tests. Useful when you clone a repository or check out a new branch.   |
+| `pytest --visual-forget-all` | Forget all accepted tests.                                                               |
 
 ## FAQ
 
@@ -139,6 +140,6 @@ Before submitting a PR, please
 
 1. Run non-visual tests with `pytest`
 2. Lint your code with `pre-commit run -a`, and ensure no errors persist
-3. Verify that `pytest-visual` still works end-to-end with `pytest --visual-reset-all && pytest --visual`, and try accepting and declining changes.
+3. Verify that `pytest-visual` still works end-to-end with `pytest --visual-forget-all && pytest --visual`, and try accepting and declining changes.
 
 Also, please verify that your function inputs and outputs are type-annotated unless there's a good reason not to do so.
