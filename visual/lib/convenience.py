@@ -6,7 +6,7 @@ from plotly.graph_objs import Figure
 from plotly.subplots import make_subplots
 
 from visual.lib.hasher import vector_hash_equal
-from visual.lib.models import MaterialStatement, ReferenceStatement
+from visual.lib.models import OnDiskStatement, Statement
 
 
 def get_grid_shape(num_images: int, max_cols: int) -> Tuple[int, int]:
@@ -134,7 +134,7 @@ def correct_layout(image: np.ndarray, layout: str) -> np.ndarray:
 # Statements
 
 
-def statement_lists_equal(prev_statements: List[MaterialStatement], statements: List[ReferenceStatement]) -> bool:
+def statement_lists_equal(prev_statements: List[Statement], statements: List[OnDiskStatement]) -> bool:
     if len(prev_statements) != len(statements):
         return False
 

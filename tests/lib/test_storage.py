@@ -5,10 +5,10 @@ import numpy as np
 import pytest
 from plotly import graph_objs as go
 
-from visual.lib.models import HashVector_, MaterialStatement, ReferenceStatement
+from visual.lib.models import HashVector_, OnDiskStatement, Statement
 from visual.lib.storage import (
     get_storage_path,
-    load_statement_references,
+    load_on_disk_statements,
     materialize_assets,
     store_statements,
 )
@@ -35,20 +35,20 @@ def test_store_load_statements(get_storage_path_fixture):
     hash_vector = HashVector_(Vector=[1, 2, 3], ErrorThreshold=0.1)
 
     # Store statements
-    stored_mats: List[MaterialStatement] = []
-    stored_mats.append(MaterialStatement(Type="text", Text="This is a test", Hash="123"))
-    stored_mats.append(MaterialStatement(Type="figure", Asset=fig, Hash="456"))
-    stored_mats.append(MaterialStatement(Type="image", Asset=image, Hash="789", HashVector=hash_vector))
-    store_statements(get_storage_path_fixture, stored_mats)
+    stored_statements: List[Statement] = []
+    stored_statements.append(Statement(Type="text", Text="This is a test", Hash="123"))
+    stored_statements.append(Statement(Type="figure", Asset=fig, Hash="456"))
+    stored_statements.append(Statement(Type="image", Asset=image, Hash="789", HashVector=hash_vector))
+    store_statements(get_storage_path_fixture, stored_statements)
 
     # Load/materialize statements
-    loaded_refs = load_statement_references(get_storage_path_fixture)
-    assert loaded_refs is not None
-    loaded_mats = [materialize_assets(r, get_storage_path_fixture) for r in loaded_refs]
+    loaded_statements_on_disk = load_on_disk_statements(get_storage_path_fixture)
+    assert loaded_statements_on_disk is not None
+    loaded_statements = [materialize_assets(r, get_storage_path_fixture) for r in loaded_statements_on_disk]
 
     # Verify loaded statements
-    assert len(loaded_mats) == len(stored_mats)
-    for loaded, stored in zip(loaded_mats, stored_mats):
+    assert len(loaded_statements) == len(stored_statements)
+    for loaded, stored in zip(loaded_statements, stored_statements):
         assert loaded.Type == stored.Type
         assert loaded.Text == stored.Text
         assert loaded.Hash == stored.Hash

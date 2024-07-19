@@ -10,7 +10,7 @@ class HashVector_(BaseModel):
     ErrorThreshold: float
 
 
-class ReferenceStatement(BaseModel):
+class OnDiskStatement(BaseModel):
     Type: Literal["text", "image", "figure"]
     Text: Optional[str] = None
     Asset: Optional[str] = None
@@ -34,7 +34,7 @@ class ReferenceStatement(BaseModel):
         return v
 
 
-class MaterialStatement(BaseModel):
+class Statement(BaseModel):
     class Config:
         arbitrary_types_allowed = True
 

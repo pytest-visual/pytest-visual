@@ -9,7 +9,7 @@ from _pytest.fixtures import FixtureRequest
 from PIL import Image
 from plotly.graph_objs import Figure
 
-from visual.lib.models import MaterialStatement, ReferenceStatement
+from visual.lib.models import OnDiskStatement, Statement
 
 
 def get_storage_path(request: FixtureRequest) -> Path:
@@ -30,20 +30,20 @@ def get_storage_path(request: FixtureRequest) -> Path:
     return root_path / ".pytest-visual" / "checkpoint" / relative_path / function_name
 
 
-def load_statement_references(storage_path: Path) -> Optional[List[ReferenceStatement]]:
+def load_on_disk_statements(storage_path: Path) -> Optional[List[OnDiskStatement]]:
     checkpoint_path = storage_path / _checkpoint_file
     if checkpoint_path.exists():
         with checkpoint_path.open("r") as f:
             statements_dict_list = json.load(f)["statements"]
-            reference_statements: List[ReferenceStatement] = []
+            reference_statements: List[OnDiskStatement] = []
             for statement_dict in statements_dict_list:
-                reference_statements.append(ReferenceStatement(**statement_dict))
+                reference_statements.append(OnDiskStatement(**statement_dict))
             return reference_statements
     else:
         return None
 
 
-def materialize_assets(reference: ReferenceStatement, prefix_path: Path) -> MaterialStatement:
+def materialize_assets(reference: OnDiskStatement, prefix_path: Path) -> Statement:
     materialized_asset: Optional[Union[np.ndarray, Figure]] = None
     if reference.Asset is not None:
         full_path = prefix_path / reference.Asset
@@ -52,7 +52,7 @@ def materialize_assets(reference: ReferenceStatement, prefix_path: Path) -> Mate
         if reference.Type == "image":
             materialized_asset = np.array(Image.open(full_path))
 
-    return MaterialStatement(
+    return Statement(
         Type=reference.Type,
         Text=reference.Text,
         Asset=materialized_asset,
@@ -62,12 +62,12 @@ def materialize_assets(reference: ReferenceStatement, prefix_path: Path) -> Mate
     )
 
 
-def store_statements(storage_dir: Path, materials: List[MaterialStatement]) -> None:
+def store_statements(storage_dir: Path, materials: List[Statement]) -> None:
     """
     Stores the statements and their assets in the given directory.
     """
 
-    references: List[ReferenceStatement] = []
+    references: List[OnDiskStatement] = []
     for statement_idx, material in enumerate(materials):
         asset_ref: Optional[str] = None
         if material.Asset is not None:
@@ -85,7 +85,7 @@ def store_statements(storage_dir: Path, materials: List[MaterialStatement]) -> N
                 Image.fromarray(material.Asset).save(storage_dir / ref)
                 asset_ref = str(ref)
 
-        ref = ReferenceStatement(
+        ref = OnDiskStatement(
             Type=material.Type,
             Text=material.Text,
             Asset=asset_ref,

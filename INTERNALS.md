@@ -87,6 +87,6 @@ When a test case is run, the visualizations are compared to the previously store
 
 All statements must match, or test case is failed.
 
-### `MaterialStatement` and `ReferenceStatement` Pydantic models
+### `Statement` and `OnDiskStatement` Pydantic models
 
-In-memory statements are represented by the `MaterialStatement` and `ReferenceStatement` Pydantic models. The `MaterialStatement` model contains everything including the asset as numpy array or plotly figure (if applicable), while the `ReferenceStatement` model only contains string filename of the asset (if applicable). Thus `ReferenceStatement` directly maps one-to-one to the JSON representation, and is directly used during the conversion process. `MaterialStatement` on the other hand is used while collecting data from the test case and showing results.
+In-memory statements are represented by the `Statement` and `OnDiskStatement` Pydantic models. The `Statement` model contains everything including the asset as numpy array or plotly figure (if applicable), while the `OnDiskStatement` model only contains string filename of the asset (if applicable). Thus `OnDiskStatement` directly maps one-to-one to the JSON representation, and is directly used during the conversion process. `Statement` on the other hand is used while collecting data from the test case and showing results.

@@ -8,7 +8,7 @@ from visual.lib.convenience import (
     get_layout_from_image,
     statement_lists_equal,
 )
-from visual.lib.models import HashVector_, MaterialStatement, ReferenceStatement
+from visual.lib.models import HashVector_, OnDiskStatement, Statement
 
 
 def test_get_grid_shape():
@@ -70,13 +70,13 @@ def test_correct_layout():
 
 def test_statement_lists_equal():
     refs = [
-        ReferenceStatement(Type="text", Hash="", Text=""),
-        ReferenceStatement(Type="image", Hash=""),
-        ReferenceStatement(Type="image", Hash="abc"),
-        ReferenceStatement(Type="image", Hash="abc", HashVector=HashVector_(Vector=[1.0, 2.0, 3.0], ErrorThreshold=0.1)),
-        ReferenceStatement(Type="image", Hash="abc", HashVector=HashVector_(Vector=[3.0, 4.0, 5.0], ErrorThreshold=0.1)),
+        OnDiskStatement(Type="text", Hash="", Text=""),
+        OnDiskStatement(Type="image", Hash=""),
+        OnDiskStatement(Type="image", Hash="abc"),
+        OnDiskStatement(Type="image", Hash="abc", HashVector=HashVector_(Vector=[1.0, 2.0, 3.0], ErrorThreshold=0.1)),
+        OnDiskStatement(Type="image", Hash="abc", HashVector=HashVector_(Vector=[3.0, 4.0, 5.0], ErrorThreshold=0.1)),
     ]
-    mats = [MaterialStatement(**ref.model_dump()) for ref in refs]
+    mats = [Statement(**ref.model_dump()) for ref in refs]
 
     for mat, ref in zip(mats, refs):
         assert statement_lists_equal([mat], [ref])

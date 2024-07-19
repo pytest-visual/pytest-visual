@@ -21,10 +21,10 @@ from visual.lib.convenience import (
 )
 from visual.lib.flags import get_options, get_visualization_flags, pytest_addoption
 from visual.lib.hasher import hash_text, vector_hash_equal
-from visual.lib.models import MaterialStatement
+from visual.lib.models import Statement
 from visual.lib.storage import (
     get_storage_path,
-    load_statement_references,
+    load_on_disk_statements,
     materialize_assets,
     store_statements,
 )
@@ -36,7 +36,7 @@ class VisualFixture:
         """
         An object to collect visualization statements.
         """
-        self.statements: List[MaterialStatement] = []
+        self.statements: List[Statement] = []
 
     # Core interface
 
@@ -48,7 +48,7 @@ class VisualFixture:
         - text (str): The text to show.
         """
         hsh = hash_text(text)
-        statement = MaterialStatement(Type="text", Text=text, Hash=hsh)
+        statement = Statement(Type="text", Text=text, Hash=hsh)
         self.statements.append(statement)
 
     def figure(self, figure: Figure) -> None:
@@ -59,7 +59,7 @@ class VisualFixture:
         - fig (Figure): The figure to show.
         """
         hsh = hash_text(str(figure.to_json()))
-        statement = MaterialStatement(Type="figure", Asset=figure, Hash=hsh)
+        statement = Statement(Type="figure", Asset=figure, Hash=hsh)
         self.statements.append(statement)
 
     def images(
@@ -168,7 +168,7 @@ def visual(request: FixtureRequest, visual_UI: UI) -> Generator[VisualFixture, N
         if not accept_all:
             # Read previous statements
             location = Location(request.node.module.__file__, request.node.name)  # type: ignore
-            prev_ref_statements = load_statement_references(storage_path)
+            prev_ref_statements = load_on_disk_statements(storage_path)
 
             # Prompt user if statements have changed
             if prev_ref_statements is None or not statement_lists_equal(statements, prev_ref_statements):

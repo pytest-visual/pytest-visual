@@ -11,7 +11,7 @@ from dash import Dash, Input, Output, ctx, dcc, html
 from plotly.graph_objs import Figure
 
 from visual.lib.flags import get_visualization_flags, print_visualization_message
-from visual.lib.storage import MaterialStatement
+from visual.lib.storage import Statement
 
 logging.basicConfig(level=logging.INFO)  # To see Dash url
 
@@ -119,7 +119,7 @@ class UI:
         self.curr_statements = self._render_statements_in_div([], "curr-statements")
 
     def prompt_user(
-        self, location: "Location", prev_statements: Optional[List[MaterialStatement]], curr_statements: List[MaterialStatement]
+        self, location: "Location", prev_statements: Optional[List[Statement]], curr_statements: List[Statement]
     ) -> bool:
         """
         Prompts the user with statements for review and waits for user interaction (accept/decline).
@@ -205,7 +205,7 @@ class UI:
         ]
         self.file_name = dbc.CardHeader(element, id="file-name")
 
-    def _render_statements_in_div(self, statements: Optional[List[MaterialStatement]], div_id: str) -> dbc.CardBody:
+    def _render_statements_in_div(self, statements: Optional[List[Statement]], div_id: str) -> dbc.CardBody:
         """
         Renders statements into a specified division in the UI.
         Each statement could either be a text statement, plotly figure, or images.
