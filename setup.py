@@ -14,6 +14,7 @@ def get_requirements() -> List[str]:
         "pandas>=2.0.0",
         "graphviz>=0.17",
         "Pillow>=8.0.0",
+        "pydantic>=2.0.0",
     ]
 
 
@@ -44,5 +45,6 @@ setup(
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
     ],
 )
