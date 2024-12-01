@@ -7,6 +7,7 @@ from typing import Generator, List, Optional
 
 import numpy as np
 import pytest
+from _pytest.config.argparsing import Parser
 from _pytest.fixtures import FixtureRequest
 from PIL import Image
 from plotly.graph_objs import Figure
@@ -19,7 +20,7 @@ from visual.lib.convenience import (
     get_layout_from_image,
     statement_lists_equal,
 )
-from visual.lib.flags import get_options, get_visualization_flags
+from visual.lib.flags import add_pytest_flags, get_options, get_visualization_flags
 from visual.lib.hasher import hash_text
 from visual.lib.models import Statement
 from visual.lib.storage import get_storage_path, load_on_disk_statements, materialize_assets, store_statements
@@ -274,3 +275,7 @@ def pytest_collection_modifyitems(items, config):
         print(f" Deleting checkpoints at {checkpoint_path}")
         if checkpoint_path.exists():
             shutil.rmtree(checkpoint_path)
+
+
+def pytest_addoption(parser: Parser) -> None:
+    add_pytest_flags(parser)

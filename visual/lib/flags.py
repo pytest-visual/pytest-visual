@@ -20,7 +20,7 @@ def print_visualization_message(port_number: int) -> None:
         print()
 
 
-def pytest_addoption(parser: Parser):
+def add_pytest_flags(parser: Parser):
     parser.addoption("--visual", action="store_true", help="Run visualization tests, prompt for acceptance")
     parser.addoption("--visual-accept-all", action="store_true", help="Visualization tests are accepted without prompting")
     parser.addoption("--visual-forget-all", action="store_true", help="Don't visualize, but mark all visualization cases as unaccepted")  # fmt: skip
