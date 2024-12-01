@@ -19,15 +19,10 @@ from visual.lib.convenience import (
     get_layout_from_image,
     statement_lists_equal,
 )
-from visual.lib.flags import get_options, get_visualization_flags, pytest_addoption
-from visual.lib.hasher import hash_text, vector_hash_equal
+from visual.lib.flags import get_options, get_visualization_flags
+from visual.lib.hasher import hash_text
 from visual.lib.models import Statement
-from visual.lib.storage import (
-    get_storage_path,
-    load_on_disk_statements,
-    materialize_assets,
-    store_statements,
-)
+from visual.lib.storage import get_storage_path, load_on_disk_statements, materialize_assets, store_statements
 from visual.lib.ui import UI, Location, visual_UI
 
 

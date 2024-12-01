@@ -5,13 +5,8 @@ import numpy as np
 import pytest
 from plotly import graph_objs as go
 
-from visual.lib.models import HashVector_, OnDiskStatement, Statement
-from visual.lib.storage import (
-    get_storage_path,
-    load_on_disk_statements,
-    materialize_assets,
-    store_statements,
-)
+from visual.lib.models import HashVector_, Statement
+from visual.lib.storage import get_storage_path, load_on_disk_statements, materialize_assets, store_statements
 
 
 @pytest.fixture
@@ -53,7 +48,7 @@ def test_store_load_statements(get_storage_path_fixture):
         assert loaded.Text == stored.Text
         assert loaded.Hash == stored.Hash
         if loaded.Type == "image":
-            assert type(loaded.Asset) == np.ndarray and type(stored.Asset) == np.ndarray
+            assert isinstance(loaded.Asset, np.ndarray) and isinstance(stored.Asset, np.ndarray)
             assert np.array_equal(loaded.Asset, stored.Asset)  # Jpeg compression does not change constant images
         else:
             assert loaded.Asset == stored.Asset

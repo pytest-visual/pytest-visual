@@ -2,7 +2,7 @@ from typing import List, Literal, Optional, Union
 
 import numpy as np
 from plotly.graph_objs import Figure
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, validator
 
 
 class HashVector_(BaseModel):

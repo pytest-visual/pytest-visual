@@ -4,22 +4,10 @@ from typing import List
 import cv2
 import numpy as np
 import pytest
-import torchview
-from PIL import Image
 from torch import Tensor
 
-from examples.end_to_end.main import (
-    ClockCoordinateDataset,
-    ClockDataset,
-    Time,
-    clock_collate_fn,
-    get_label,
-    get_model,
-    get_model_head,
-    mean_norm,
-    std_norm,
-)
-from visual.interface import VisualFixture, fix_seeds, standardize, visual
+from examples.end_to_end.main import ClockCoordinateDataset, ClockDataset, Time, get_label, get_model, mean_norm, std_norm
+from visual.interface import VisualFixture, standardize, visual
 
 test_data_path = Path("examples/end_to_end/test_data")
 

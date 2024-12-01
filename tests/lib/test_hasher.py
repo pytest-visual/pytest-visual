@@ -2,13 +2,7 @@ import numpy as np
 import pytest
 
 from visual.interface import VisualFixture, standardize
-from visual.lib.hasher import (
-    FixedPattern,
-    hash_text,
-    vector_hash_array,
-    vector_hash_equal,
-    vector_hash_threshold,
-)
+from visual.lib.hasher import FixedPattern, hash_text, vector_hash_array, vector_hash_equal, vector_hash_threshold
 
 # Test FixedPattern
 

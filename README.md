@@ -96,7 +96,7 @@ Visual testing can be used to verify the correctness of
 
 - data loading and augmentation
 - synthetic data generation
-- NN model strutures
+- NN model structures
 - loss functions
 - learning rate schedules
 - detection algorithms

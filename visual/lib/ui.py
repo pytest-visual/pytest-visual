@@ -233,7 +233,7 @@ class UI:
                 if statement.Type == "text":
                     rendered_statements.append(html.Code(statement.Text, style=code_style))
                 elif statement.Type == "figure":
-                    assert type(statement.Asset) == Figure, "A figure statement must have a Figure asset"
+                    assert isinstance(statement.Asset, Figure), "A figure statement must have a Figure asset"
                     rendered_statements.append(dbc.Card(dcc.Graph(figure=statement.Asset), style=plot_style))
                 else:
                     raise ValueError(f"Invalid command {statement.Type}")
